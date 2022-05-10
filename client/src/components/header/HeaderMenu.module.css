@@ -1,0 +1,23 @@
+.headerWrapper{
+    display: flex;
+    align-items: center;
+}
+.headerNavList{
+    padding: 0 0 10px 10px;
+}
+.headerNavList ul{
+    margin: 0;
+    padding: 0;    
+}
+.headerLogo{
+    margin-right: 10px;
+    max-width: 70px;
+}
+.headerLogo img {
+    max-width: 100%;   
+    width: 80px;
+    height: 80px;
+}
+.headerTitle{
+    font-size: 1.5em;
+}

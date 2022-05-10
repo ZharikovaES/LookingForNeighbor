@@ -1,0 +1,11 @@
+.containerHeader{
+    /* position: fixed;
+    z-index: 3; */
+}
+.navList{
+    display: flex;
+    align-items: center;
+}
+.navList li + li{
+    margin-left: 20px;
+}

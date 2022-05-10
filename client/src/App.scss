@@ -1,0 +1,133 @@
+$purple:  #dcd5f2;
+$purpleDark:  #8b75a1;
+
+.App {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+body{
+}
+
+
+// .container{
+//   margin: 0 auto;
+//   padding-left: 10px;
+//   padding-right: 10px;
+//   max-width: 1200px;
+// }
+
+.hide{
+  display: block;
+  position: absolute;
+  opacity: 0;
+  //visibility: hidden;
+  width: 0;
+  height: 0;
+  z-index: -10;
+}
+
+[class*="-balloon"] {
+  border-radius: 16px;
+}
+.placemark-layout-container{
+  position: relative;
+}
+.polygon-layout {
+  width: 50px; 
+  height: 50px;
+  border-radius: 50%;
+  position: absolute;
+  left: -25px;
+  top: -58px;
+
+  img{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    z-index: 5;
+  }
+}
+
+.polygon-layout::after, .polygon-layout::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 20px;
+  width: 20px;
+}
+
+.polygon-layout::after {
+  top: 89%;
+  --bs-bg-opacity: 1;
+  background-color: $purple;
+  clip-path: polygon(50% 70%, -15% 0, 115% 0);
+}
+
+.polygon-layout::before {
+  top: 93%;
+  background-color: $purpleDark;
+  clip-path: polygon(50% 70%, -15% 0, 115% 0);
+}
+
+.bg-purple-light{
+  background-color: $purple !important;
+}
+.border-purple-dark{
+  border-color: $purpleDark !important;
+}
+.bottom{
+  @media(max-width: 575.98px){
+    button+button{
+      margin-top: 1rem;
+    }
+  }
+}
+.height-full{
+  min-height: calc(100vh - 40px);
+}
+
+.sortable-handler {
+  touch-action: none;
+}

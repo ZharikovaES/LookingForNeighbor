@@ -1,0 +1,29 @@
+.balloonImg{
+    object-fit: cover;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+}
+.partialInfo{
+    display: flex;
+    min-height: 110px;
+}
+.partialInfoColumn:first-child{
+    flex: 0 0 80px;
+    padding-right: 10px;
+}
+.partialInfoColumn:last-child{
+    flex: 1 1 calc(100% - 70px);
+}
+.partialInfoItemTitle{
+    max-width: 40%;
+    width: 30%;
+    font-weight: 600;
+}
+.partialInfoDesc{
+}
+/* .partialInfoControl{
+    display: flex;
+} */
+
+  
