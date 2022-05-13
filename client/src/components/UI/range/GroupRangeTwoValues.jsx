@@ -8,6 +8,10 @@ const GroupRangeTwoValues = props => {
                 props.values.map((el, i) => (
                     <RangeTwoValues
                         key={ props.labels[i] }
+                        style={{thumb: {
+                            height: '42px',
+                            width: '42px',                        
+                        }}}
                         label={ props.labels[i] }
                         step={ props.steps[i] }
                         min={ props.limits[i][0] }

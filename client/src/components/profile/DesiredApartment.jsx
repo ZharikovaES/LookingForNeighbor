@@ -160,12 +160,12 @@ const DesiredApartment = props => {
         },
     ];
     const [limitsOfArea, setLimitsOfArea] = useState([
-        [props.apartment.fullArea[0], 10000],
-        [props.apartment.kitchenArea[0], props.apartment.fullArea[1]]
+        [0.0, 10000.0],
+        [0.0, props.apartment.fullArea[1]]
     ]);
     const [limitsOfFloorCount, setLimitsOfFloorCount] = useState([
-        [props.apartment.floorCount[0], 300],
-        [props.apartment.floor[0], props.apartment.floorCount[1]]
+        [1, 300],
+        [1, props.apartment.floorCount[1]]
     ]);
     const budget = { min: 5000, max: 300000 };
     const ceilingHeight = { min: 1.5, max: 10.0 };
@@ -217,9 +217,13 @@ const DesiredApartment = props => {
                 min={ ceilingHeight.min }
                 max={ ceilingHeight.max }
                 values={props.apartment.ceilingHeight}
+                style={{thumb: {
+                    height: '42px',
+                    width: '42px',                        
+                }}}
                 handleChange={ values => {
                     props.handleChange({ apartment: {...props.apartment, ceilingHeight: values } });
-                } }
+                }}
             />
             <GroupRangeTwoValues
                 label="Этажи"
@@ -317,6 +321,10 @@ const DesiredApartment = props => {
                 min={ builtYear.min }
                 max={ builtYear.max }
                 values={props.apartment.builtYear}
+                style={{thumb: {
+                    height: '42px',
+                    width: '42px',                        
+                }}}
                 handleChange={ values => {
                     props.handleChange({ apartment: {...props.apartment, builtYear: values } });
                 }}

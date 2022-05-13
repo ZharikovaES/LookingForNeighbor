@@ -81,23 +81,25 @@ const deleteRefreshTokenByCityIdById = async (idCity, idUser) => {
   await session.close();
   return result.records.map(i => i.get('u').properties)[0];
 }
-const findUsersByCityIdByUserId = async (idCity, idUser, limit) => {
+const findUsersByCityIdByUserId = async (idCity, idUser, relevanceRange, limit) => {
   const session = driver.session({ database });
-  const result = await session.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user:User {_id : $idUser})-[r:RELEVANCE]->(u: User)-[s1:INCLUDES]->(d:DesiredApartment) WHERE r.coefficient > 0 
+  const result = await session.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user:User {_id : $idUser})-[r:RELEVANCE]->(u: User)-[s1:INCLUDES]->(d:DesiredApartment) WHERE r.coefficient >= $relevanceRange[0] AND r.coefficient <= $relevanceRange[1] 
                                     RETURN u, d ORDER BY r.coefficient DESC` + (limit ? ` limit ${Math.abs(Math.trunc(+limit))}` : ''),
                                     {
-                                      idCity, idUser
+                                      idCity, idUser,
+                                      relevanceRange
                                     });
 
   await session.close();
   return result.records;
 }
-const findUsersByCityIdByUserIdPartialMatch = async (idCity, idUser, limit) => {
+const findUsersByCityIdByUserIdPartialMatch = async (idCity, idUser, relevanceRange, limit) => {
   const session = driver.session({ database });
-  const result = await session.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user:User {_id : $idUser})-[r:RELEVANCE]->(u: User)-[s1:INCLUDES]->(d:DesiredApartment) WHERE r.coefficient > 0 AND r.coefficient < 1 
+  const result = await session.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user:User {_id : $idUser})-[r:RELEVANCE]->(u: User)-[s1:INCLUDES]->(d:DesiredApartment) WHERE r.coefficient >= $relevanceRange[0] AND r.coefficient <= $relevanceRange[1] 
                                     RETURN u, d ORDER BY r.coefficient DESC` + (limit ? ` limit ${Math.abs(Math.trunc(+limit))}` : ''),
                                     {
-                                      idCity, idUser
+                                      idCity, idUser,
+                                      relevanceRange
                                     });
 
   await session.close();

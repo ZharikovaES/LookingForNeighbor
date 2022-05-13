@@ -8,8 +8,8 @@ const AuthenticationButton = ({className, authenticationFunc, url = "/", childre
         type='button'
         className={["btn btn-outline-primary", className].join(' ')}
         onClick={async() => {
-          navigate(".." + url); 
           await authenticationFunc();
+          navigate(".." + url); 
         }}
       >
         { children }

@@ -132,7 +132,6 @@ const RegistrationForm = () => {
         switch (step) {
             case 0:
                 return (<InfoUser 
-
                             location={ registrationData.location }
                             newUser={ registrationData.user } 
                             characteristics={ characteristics }

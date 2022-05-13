@@ -37,8 +37,6 @@ export default class UtilService {
                 result = response.data.result;
                 if (result) result = result.filter((el, index) => index !== 0);
             }
-        // console.log("123");
-        // console.log(result);
         return result;
     }
     static async getAddresses(cityId, query){
@@ -69,6 +67,7 @@ export default class UtilService {
             if (response.data){
                 result = response.data.suggestions;
                 // console.log(result);
+                
                 if (result) result = result.filter(el => +el.data.fias_level < 65 && el.data.settlement_type !== "д").map(el => { return { value: el.unrestricted_value, label: el.value }});
             }
         return result;

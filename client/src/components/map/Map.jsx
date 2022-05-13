@@ -46,8 +46,7 @@ const Map = props => {
                     }}
                 >
                     {
-                        ymaps && ymaps.templateLayoutFactory && items.map((el, i) => { 
-                            console.log(el.item.id);
+                        ymaps?.templateLayoutFactory && items.map((el, i) => { 
                             return (
                             <yandex.Placemark 
                                 modules={["geoObject.addon.editor", "geoObject.addon.balloon", "geoObject.addon.hint"]}
@@ -71,7 +70,7 @@ const Map = props => {
                                 }}
                                 options={
                                     {
-                                    iconLayout: ymaps && ymaps.templateLayoutFactory.createClass(`<div class="placemark-layout-container"><div class="polygon-layout bg-purple-light border border-2 border-purple-dark text-dark"><img src='${URL}${el.item.image.imagePreviewUrl}'></div></div>`),
+                                    iconLayout: ymaps?.templateLayoutFactory.createClass(`<div class="placemark-layout-container"><div class="polygon-layout bg-purple-light border border-2 border-purple-dark text-dark"><img src='${URL}${el.item.image.imagePreviewUrl}'></div></div>`),
                                     iconShape: {
                                         type: 'Polygon',
                                         coordinates: [[[0,-58],[10,-50],[25,-50],[25,0],[-25,0],[-25,-50],[-10,-50],[0,-58]]],

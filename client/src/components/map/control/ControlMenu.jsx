@@ -4,6 +4,7 @@ import { Context } from "../../..";
 import GroupInputsRadio from "../../UI/input/GroupInputsRadio";
 import HeaderMenuLogo from "../../header/HeaderMenuLogo";
 import classes from "./ControlMenu.module.css";
+import RangeTwoValues from "../../UI/range/RangeTwoValues";
 
 const ControlMenu = props => {
     const { store } = useContext(Context);
@@ -35,6 +36,23 @@ const ControlMenu = props => {
                             handleChange={ e => props.changeFilter({ matchByParameters: +e.target.value }) }
                             name="matchByParameters"
                         />
+                        { [0, 1].includes(props.filter.matchByParameters) && 
+                            (
+                                <RangeTwoValues
+                                    label="Определите диапазон значений релевантности отображаемых объектов (от наименьшего до наибольшего сходства)"
+                                    step={0.2}
+                                    values={props.filter.relevanceRange}
+                                    min={0.0}
+                                    max={1.0}
+                                    style={{thumb: {
+                                        height: '32px',
+                                        width: '32px',                        
+                                    }}}
+                                    hasMarks={true}
+                                    handleChange={ values => props.changeFilter({ relevanceRange: values }) }
+                                />
+                            )
+                        }
                     </div>
                 ) : (
                     <div>

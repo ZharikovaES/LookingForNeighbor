@@ -18,8 +18,8 @@ export default class UserController {
                             .min(5)
                             .required(),
                 name: Joi.string()
-                            .pattern(/^[А-Яа-яA-Za-z]+$/, { name: 'letters' })
-                            .min(5)
+                            .pattern(/^[А-Яа-яA-Za-z\s-]+$/, { name: 'not numbers' })
+                            .min(2)
                             .required(),
             },
             places: Joi.array().min(0).items({
@@ -269,6 +269,7 @@ export default class UserController {
             if (result.user.id && formData.imageUser) await FileService.uploadFile(result.user.id, formData.imageUser);
 
             res.cookie('refreshToken', result.refreshToken, { maxAge: 30 * 24* 3600, httpOnly: true });
+            delete result.refreshToken;
             res.status(201).json(result);
         } catch (error) {
             next(error);
@@ -279,6 +280,7 @@ export default class UserController {
             const { email, password } = req.body;
             const userData = await UserService.login(email, password);
             res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24* 3600, httpOnly: true });
+            delete userData.refreshToken;
             res.status(200).json(userData);
         } catch (error) {
             next(error);
@@ -308,10 +310,12 @@ export default class UserController {
     }
     static async refresh(req, res, next) {
         try {
+            console.log("refresh:");
             const { refreshToken } = req.cookies;
             const result = await UserService.refresh(refreshToken);
-            res.cookie('refreshToken', result.refreshToken, { maxAge: 30 * 24* 3600, httpOnly: true });
             console.log(result);
+            res.cookie('refreshToken', result.refreshToken, { maxAge: 30 * 24* 3600, httpOnly: true });
+            delete result.refreshToken;
             res.status(201).json(result);
         } catch (error) {
             next(error);
@@ -322,8 +326,9 @@ export default class UserController {
         try{
             const query = req.query;
             let users = [];
+            console.log(query);
             if (query) 
-                if (query.userId) users = await UserService.getSimplifiedUsersByCityIdByUserIdByLimit(query.cityId, query.userId, parseInt(query.typeContent ?? 0), parseInt(query.matchByParameters ?? 0), query.limit);
+                if (query.userId) users = await UserService.getSimplifiedUsersByCityIdByUserIdByLimit(query.cityId, query.userId, parseInt(query.typeContent ?? 0), parseInt(query.matchByParameters ?? 0), query.relevanceRange.map(el => parseFloat(el)), query.limit);
                 else users = await UserService.getSimplifiedUsersByCityIdByLimit(query.cityId, parseInt(query.typeContent ?? 0), query.limit);
             res.json(users);    
         } catch (error){
@@ -337,7 +342,6 @@ export default class UserController {
             let result = {};
             if (cityId && userId) result = await UserService.getUserByCityIdByUserId(cityId, userId);
             else result = {};
-            console.log(result);
             res.json(result);    
         } catch (error){
             next(error);

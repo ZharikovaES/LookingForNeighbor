@@ -22,11 +22,7 @@ export default class TokenService{
 
     static validateRefreshToken(token) {
         try{
-            console.log(321);
-            console.log(token);
             const userData = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
-            console.log(123);
-            console.log(userData);
             return userData;
         } catch (error) {
             return null;

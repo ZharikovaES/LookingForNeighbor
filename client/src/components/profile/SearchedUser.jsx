@@ -37,6 +37,10 @@ const SearchedUser = props => {
                 min={minAge}
                 max={maxAge}
                 values={props.searchedUser.age}
+                style={{thumb: {
+                    height: '42px',
+                    width: '42px',                        
+                }}}
                 handleChange={ values => props.handleChange({ searchedUser: {...props.searchedUser, age: values } }) }
             />
             <MultiSelectSearch

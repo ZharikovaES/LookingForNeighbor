@@ -87,6 +87,7 @@ export default class Store{
         try {
             await AuthService.logout({ cityId: this.location.city.idKladr, userId: this.user.id });
             localStorage.removeItem('token');
+            this.setAuth(false);
             this.setUser({});
             this.setSearchedUser({});
             this.setApartment({});
@@ -103,7 +104,6 @@ export default class Store{
                 coordinates: []   
             });
             localStorage.removeItem('token')
-            this.setAuth(false);
 
         } catch (error) {
             if (error.response)
@@ -118,12 +118,11 @@ export default class Store{
         try {
             const response = await axios.get(API_URL + 'refresh', { withCredentials: true });
             localStorage.setItem('token', response.data.accessToken);
-            this.setAuth(true);
             this.setLocation(response.data.location);
             this.setUser(response.data.user);
             this.setSearchedUser(response.data.searchedUser);
             this.setApartment(response.data.apartment);
-            console.log(response.data);
+            this.setAuth(true);
             return this.isAuth;
         } catch (error){
             if (error.response)

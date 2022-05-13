@@ -14,7 +14,9 @@ export default class UserService{
         data.user.activationLink = uuidv4();
         const records = await userModel.create(data.location, data.user, data.searchedUser, data.apartment);
         const { location, user, searchedUser, apartment } = ConvertService.convertDataDbObjToClientObj(records);
-        user.password = '';
+        delete user.password;
+        delete user.accessToken;
+        delete user.refreshToken;
         await MailService.sendActivationMail(user.email, process.env.API_URL + 'api/activate/' + data.location.city.idKladr + "/" + user.activationLink);
         const tokens = TokenService.generateTokens({...location, ...user});
         await TokenService.saveToken(location, user.id, tokens.refreshToken);
@@ -27,17 +29,17 @@ export default class UserService{
         await userModel.update({ city: { idKladr: cityId} }, user);
     }
     static async login(email, password){
-        console.log(email, password);
         const records = await userModel.findByEmail(email);
-        console.log(records);
-        console.log(ConvertService.convertDataDbObjToClientObj);         
         const {location, user, searchedUser, apartment} = ConvertService.convertDataDbObjToClientObj(records);
         if (!user) throw ApiError.BadRequest('Пользователь с таким email не найден');
         const isPassEquals = await bcrypt.compare(password, user.password);
         if (!isPassEquals) throw ApiError.BadRequest('Неверный пароль');
+        delete user.password;
+        delete user.accessToken;
+        delete user.refreshToken;
         const tokens = TokenService.generateTokens({...location, ...user});
         await TokenService.saveToken(location, user.id, tokens.refreshToken);
-        return {...tokens, location, user, searchedUser, apartment}
+        return {...tokens, location, user, searchedUser, apartment};
     }
     static async logout(cityId, userId){
         const user = await TokenService.removeToken(cityId, userId);
@@ -45,16 +47,16 @@ export default class UserService{
     }
     static async refresh (refreshToken) {
         if (!refreshToken) throw ApiError.UnauthorizedError();
-        console.log(refreshToken);
         const userData = TokenService.validateRefreshToken(refreshToken);
-        console.log("userData:");
-        console.log(userData);
         const tokenFromDB = await TokenService.findToken(userData.city.idKladr, userData.id);
         // console.log("tokenFromDB:");
         // console.log(tokenFromDB);
         if (!(userData && tokenFromDB)) throw ApiError.UnauthorizedError();
         const records = await userModel.findByCityIdByUserId(userData.city.idKladr, userData.id);
         const { location, user, searchedUser, apartment } = ConvertService.convertDataDbObjToClientObj(records);
+        delete user.password;
+        delete user.accessToken;
+        delete user.refreshToken;
         const tokens = TokenService.generateTokens({...location, ...user});
 
         await TokenService.saveToken(location, user.id, tokens.refreshToken);
@@ -83,15 +85,15 @@ export default class UserService{
         return result;
     }
 
-    static async getSimplifiedUsersByCityIdByUserIdByLimit(cityId, userId, typeContent, matchByParameters, limit){
+    static async getSimplifiedUsersByCityIdByUserIdByLimit(cityId, userId, typeContent, matchByParameters, relevanceRange, limit){
         let result = null;
 
         if (matchByParameters === 0) {
             if (typeContent === 0){
-                const records = await userModel.findUsersByCityIdByUserId(cityId, userId, limit);
+                const records = await userModel.findUsersByCityIdByUserId(cityId, userId, relevanceRange, limit);
                 result = ConvertService.convertDataDbObjToClientSimplifiedObj(records);
             } else if (typeContent === 1){
-                const records = await userModel.findUsersByCityIdByUserId(cityId, userId, limit);
+                const records = await userModel.findUsersByCityIdByUserId(cityId, userId, relevanceRange, limit);
                 result = ConvertService.convertDataDbObjToClientSimplifiedObj(records);
             } else if (typeContent === 2){
         
@@ -99,10 +101,10 @@ export default class UserService{
         }
         else if (matchByParameters === 1){
             if (typeContent === 0){
-                const records = await userModel.findUsersByCityIdByUserIdPartialMatch(cityId, userId, limit);
+                const records = await userModel.findUsersByCityIdByUserIdPartialMatch(cityId, userId, relevanceRange, limit);
                 result = ConvertService.convertDataDbObjToClientSimplifiedObj(records);
             } else if (typeContent === 1){
-                const records = await userModel.findUsersByCityIdByUserIdPartialMatch(cityId, userId, limit);
+                const records = await userModel.findUsersByCityIdByUserIdPartialMatch(cityId, userId, relevanceRange, limit);
                 result = ConvertService.convertDataDbObjToClientSimplifiedObj(records);
             } else if (typeContent === 2){
         
