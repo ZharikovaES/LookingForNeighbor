@@ -12,13 +12,16 @@ const Home = () => {
     const { store } = useContext(Context);
     const [simplifiedUsers, setSimplifiedUsers ] = useState([]);
     const [ filter, setFilter ] = useState({
+                                                typeOfSimilarity: 0,
                                                 typeContent: 0,
                                                 matchByParameters: 0,
                                                 relevanceRange: [0.0, 1.0]
                                             });
     useEffect(async () => {
         if (store.isAuth){
+            console.log(store);
             const simplifiedUsers = await UserService.getSimplifiedUsers({cityId: store.location.city.idKladr, userId: store.user.id, ...filter});
+            console.log(simplifiedUsers);
             setSimplifiedUsers(simplifiedUsers.map(el => { return { ...el, coordinatesPlaces: el.coordinatesPlaces}}));
 
         } else {

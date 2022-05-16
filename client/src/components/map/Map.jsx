@@ -53,7 +53,7 @@ const Map = props => {
                                 key={el.key} 
                                 geometry={el.coordinates} 
                                 properties={{
-                                    clusterCaption: el.item.username,
+                                    clusterCaption: el.item.username + (el.item.estimatedScore ? `${el.item.estimatedScore}%` : ''),
                                     balloonContentBody: renderToString(<BalloonContentBody
                                                                             userId={el.item.id}
                                                                             username={el.item.username}

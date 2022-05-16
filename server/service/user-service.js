@@ -5,6 +5,7 @@ import MailService from "./mail-service.js";
 import TokenService from "./token-service.js";
 import ApiError from "../exceptions/ApiError.js";
 import ConvertService from "./convert-service.js";
+import RelevanceByRatingService from "./relevancy-by-ratings-service.js";
 
 export default class UserService{
     static async registration(data){
@@ -63,8 +64,8 @@ export default class UserService{
         return {...tokens, location, user, searchedUser, apartment };
     }
 
-    static async getUserByCityIdByUserId(cityId, userId){
-        const records = await userModel.findByCityIdByUserId(cityId, userId);
+    static async getUserByCityIdByUserId(cityId, userId, currentUserId){
+        const records = await userModel.findByCityIdByUserIdRating(cityId, userId, currentUserId);
         const result = ConvertService.convertDataDbObjToClientObj(records);
         return result;
     }
@@ -85,44 +86,60 @@ export default class UserService{
         return result;
     }
 
-    static async getSimplifiedUsersByCityIdByUserIdByLimit(cityId, userId, typeContent, matchByParameters, relevanceRange, limit){
+    static async getSimplifiedUsersByCityIdByUserIdByLimit(cityId, userId, typeContent, typeOfSimilarity, matchByParameters, relevanceRange, limit){
         let result = null;
+        if (typeOfSimilarity === 0)
+            if (matchByParameters === 0) {
+                if (typeContent === 0){
+                    const records = await userModel.findUsersByCityIdByUserId(cityId, userId, relevanceRange, limit);
+                    result = ConvertService.convertDataDbObjToClientSimplifiedObj(records);
+                } else if (typeContent === 1){
+                    const records = await userModel.findUsersByCityIdByUserId(cityId, userId, relevanceRange, limit);
+                    result = ConvertService.convertDataDbObjToClientSimplifiedObj(records);
+                } else if (typeContent === 2){
+            
+                }
+            }
+            else if (matchByParameters === 1){
+                if (typeContent === 0){
+                    const records = await userModel.findUsersByCityIdByUserIdPartialMatch(cityId, userId, relevanceRange, limit);
+                    result = ConvertService.convertDataDbObjToClientSimplifiedObj(records);
+                } else if (typeContent === 1){
+                    const records = await userModel.findUsersByCityIdByUserIdPartialMatch(cityId, userId, relevanceRange, limit);
+                    result = ConvertService.convertDataDbObjToClientSimplifiedObj(records);
+                } else if (typeContent === 2){
+            
+                }
+            }
+            else if (matchByParameters === 2) {
+                if (typeContent === 0){
+                    const records = await userModel.findUsersByCityIdByUserIdFullMatch(cityId, userId, limit);
+                    result = ConvertService.convertDataDbObjToClientSimplifiedObj(records);
+                } else if (typeContent === 1){
+                    const records = await userModel.findUsersByCityIdByUserIdFullMatch(cityId, userId, limit);
+                    result = ConvertService.convertDataDbObjToClientSimplifiedObj(records);
+                } else if (typeContent === 2){
+            
+                }
+            }
+        else if (typeOfSimilarity === 1){
+            if (typeContent === 0){
+                const records = await userModel.findUsersByCityIdByUserIdByEstimatedScore(cityId, userId, relevanceRange, limit);
+                result = ConvertService.convertDataDbObjToClientSimplifiedObj(records);
+            } else if (typeContent === 1){
+                const records = await userModel.findUsersByCityIdByUserIdByEstimatedScore(cityId, userId, relevanceRange, limit);
+                result = ConvertService.convertDataDbObjToClientSimplifiedObj(records);
+            } else if (typeContent === 2){
+        
+            }
 
-        if (matchByParameters === 0) {
-            if (typeContent === 0){
-                const records = await userModel.findUsersByCityIdByUserId(cityId, userId, relevanceRange, limit);
-                result = ConvertService.convertDataDbObjToClientSimplifiedObj(records);
-            } else if (typeContent === 1){
-                const records = await userModel.findUsersByCityIdByUserId(cityId, userId, relevanceRange, limit);
-                result = ConvertService.convertDataDbObjToClientSimplifiedObj(records);
-            } else if (typeContent === 2){
-        
-            }
-        }
-        else if (matchByParameters === 1){
-            if (typeContent === 0){
-                const records = await userModel.findUsersByCityIdByUserIdPartialMatch(cityId, userId, relevanceRange, limit);
-                result = ConvertService.convertDataDbObjToClientSimplifiedObj(records);
-            } else if (typeContent === 1){
-                const records = await userModel.findUsersByCityIdByUserIdPartialMatch(cityId, userId, relevanceRange, limit);
-                result = ConvertService.convertDataDbObjToClientSimplifiedObj(records);
-            } else if (typeContent === 2){
-        
-            }
-        }
-        else if (matchByParameters === 2) {
-            if (typeContent === 0){
-                const records = await userModel.findUsersByCityIdByUserIdFullMatch(cityId, userId, limit);
-                result = ConvertService.convertDataDbObjToClientSimplifiedObj(records);
-            } else if (typeContent === 1){
-                const records = await userModel.findUsersByCityIdByUserIdFullMatch(cityId, userId, limit);
-                result = ConvertService.convertDataDbObjToClientSimplifiedObj(records);
-            } else if (typeContent === 2){
-        
-            }
         }
         // console.log(result);
         return result;
     }
-
+    static async pushNewRatingToUser(data){
+        const { cityId, userId, ratedUserId, newRating } = data;
+        await userModel.pushNewRatingByCityIdByUserId(cityId, userId, ratedUserId, newRating);
+        RelevanceByRatingService.createMatrix(cityId, userId);
+    }
 }

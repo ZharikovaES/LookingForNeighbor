@@ -5,6 +5,7 @@ export default class UserService {
     static async getSimplifiedUsers(params){
         let simplifiedUsers = [];
         const response = await axios.get(API_URL + 'users/simplified', { params });
+        console.log(response.data);
         if (response.data)
             simplifiedUsers = response.data;
         return simplifiedUsers;

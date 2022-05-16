@@ -257,6 +257,15 @@ export default class UserController {
                             .required()
         },
     });
+    static async postNewRating(req, res, next){
+        try {
+            const data = req.body;
+            await UserService.pushNewRatingToUser(data);
+            res.status(200);
+        } catch (error) {
+            next(error);
+        }
+    }
     static async registration(req, res, next) {
         try {
             const formData = req.files;
@@ -328,7 +337,7 @@ export default class UserController {
             let users = [];
             console.log(query);
             if (query) 
-                if (query.userId) users = await UserService.getSimplifiedUsersByCityIdByUserIdByLimit(query.cityId, query.userId, parseInt(query.typeContent ?? 0), parseInt(query.matchByParameters ?? 0), query.relevanceRange.map(el => parseFloat(el)), query.limit);
+                if (query.userId) users = await UserService.getSimplifiedUsersByCityIdByUserIdByLimit(query.cityId, query.userId, parseInt(query.typeContent ?? 0), parseInt(query.typeOfSimilarity ?? 0), parseInt(query.matchByParameters ?? 0), query.relevanceRange.map(el => parseFloat(el)), query.limit);
                 else users = await UserService.getSimplifiedUsersByCityIdByLimit(query.cityId, parseInt(query.typeContent ?? 0), query.limit);
             res.json(users);    
         } catch (error){
@@ -339,8 +348,9 @@ export default class UserController {
         try{
             const cityId = req.params.cityId;
             const userId = req.params.userId;
+            const currentUserId = req.params.currentUserId;
             let result = {};
-            if (cityId && userId) result = await UserService.getUserByCityIdByUserId(cityId, userId);
+            if (cityId && userId && currentUserId) result = await UserService.getUserByCityIdByUserId(cityId, userId, currentUserId);
             else result = {};
             res.json(result);    
         } catch (error){

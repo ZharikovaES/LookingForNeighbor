@@ -6,9 +6,9 @@ const user = Router();
 
 
 user.get('/users/simplified', userController.getSimplifiedInformationUsers);
-user.get('/users/:cityId/:userId', userController.getUserById);
+user.get('/users/:cityId/:userId/:currentUserId', userController.getUserById);
 
-user.post('/registration', userController.registration );
+user.post('/user/rating', userController.postNewRating );
 user.post('/login', userController.login);
 user.post('/logout', userController.logout);
 
