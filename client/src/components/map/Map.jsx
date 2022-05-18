@@ -28,7 +28,7 @@ const Map = props => {
     };
 
     window.addItem = userId => {
-        navigate(`/users/${userId}`)
+        navigate(`/chat/${store.location.city.idKladr}/${userId}`)
     };
 
     return (
@@ -64,7 +64,7 @@ const Map = props => {
                                                                         />),
                                     balloonContentFooter: ` <div class="row justify-content-evenly">
                                                                 <button class="col-md-5 btn btn-primary lh-sm" type="button" onclick="window.openItem('${el.item.id}')">Посмотреть анкету</button>
-                                                                <button class="col-md-5 btn btn-primary lh-sm" type="button" onclick="window.addItem('${el.item.id}')">Добавить в избранное</button>
+                                                                <button class="col-md-5 btn btn-primary lh-sm" type="button" onclick="window.addItem('${el.item.id}')">Написать</button>
                                                             </div>
                                     `
                                 }}

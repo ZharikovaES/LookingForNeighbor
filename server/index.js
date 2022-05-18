@@ -11,10 +11,13 @@ import fs from 'fs';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import fileUpload from 'express-fileupload';
+import { Server } from 'socket.io';
+import { connection } from './controllers/socket-controller.js';
 
 import errorMiddleware from './middlewares/error-middleware.js';
 import apartment from './routes/apartment.js';
 import user from './routes/user.js';
+import chat from './routes/chat.js';
 import util from './routes/util.js';
 
 
@@ -34,6 +37,7 @@ app.use(express.static('files'));
 app.use('/', apartment);
 app.use('/api', user);
 app.use('/api', util);
+app.use('/api', chat);
 app.use(errorMiddleware);
 
 
@@ -44,6 +48,13 @@ app.use(errorMiddleware);
 //         console.log(result);
 //     });
 
-app.listen(process.env.PORT ?? 5000, () => {
+const server = app.listen(process.env.PORT ?? 5000, () => {
     console.log('Server has been started...');
 })
+export const io = new Server(server, {
+    cors: {
+        credentials: true,
+        origin: process.env.CLIENT_URL
+    }
+  });
+io.on('connection', connection);

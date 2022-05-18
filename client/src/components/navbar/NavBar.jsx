@@ -8,7 +8,7 @@ const NavBar = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const publicLinksNavBar = [{path: "/", title: "Главная"}, {path: "/login", title: "Войти"}, {path: "/registration", title: "Регистрация"}];
-    const privateLinksNavBar = [{path: "/", title: "Выйти"}];
+    const privateLinksNavBar = [{path: `/chat/${store.location.city.idKladr}`, title: "Чат"}, {path: "/", title: "Выйти"}];
 
     const logout = async () => {
         await store.logout();
@@ -18,7 +18,11 @@ const NavBar = () => {
         <nav>
             <ul className={classes.navList}>
                 { store.isAuth ? 
-                    <li className="nav-item"><button className="nav-link" onClick={e => logout()}>Выйти</button></li> 
+                    privateLinksNavBar.map(el => location.pathname === el.path && el.title !== "Выйти" || (
+                        <li className="nav-item" key={el.path}>{
+                            el.title === "Выйти" ? <button className="nav-link" onClick={e => logout()}>Выйти</button>
+                            : <Link className="nav-link" to={el.path}>{ el.title }</Link>}</li>
+                    ))
                     :
                     publicLinksNavBar.map(el => location.pathname === el.path || (
                         <li className="nav-item" key={el.path}><Link className="nav-link" to={el.path}>{ el.title }</Link></li>

@@ -1,0 +1,25 @@
+.channelList {
+    width: 20%;
+    border: 1px solid rgb(224, 224, 224);
+    padding: 10px;
+    margin: 10px;
+    /* height: calc(100% - 22px); */
+}
+.channelItem {
+    border-bottom: 1px solid rgb(224, 224, 224);
+    padding: 10px;
+    cursor: pointer;
+}
+.channelItem.active{
+    background-color: rgb(153, 186, 218);
+}
+
+.channelItem div {
+    font-weight: bold;
+}‍
+.channelItem span {
+    font-size: 10px;
+}‍
+.channelItem:hover {
+    background-color: rgb(224, 224, 224);
+}

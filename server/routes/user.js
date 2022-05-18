@@ -4,7 +4,6 @@ import userModel from "../models/user.js";
 
 const user = Router();
 
-
 user.get('/users/simplified', userController.getSimplifiedInformationUsers);
 user.get('/users/:cityId/:userId/:currentUserId', userController.getUserById);
 

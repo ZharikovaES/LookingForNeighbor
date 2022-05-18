@@ -1,4 +1,5 @@
 import About from "../pages/About";
+import Chat from "../pages/chat/Chat";
 import Error from "../pages/Error";
 import Home from "../pages/home/Home";
 import ItemIdPage from "../pages/ItemIdPage";
@@ -11,6 +12,8 @@ export const routes = [
     {path: '/registration', element: <Registration/>, exact: true, auth: false},
     {path: '/login', element: <Login/>, exact: true, auth: false},
     {path: '/users/:cityId/:userId', element: <ItemIdPage/>, auth: true},
+    {path: '/chat/:cityId/', element: <Chat/>, auth: true},
+    {path: '/chat/:cityId/:userId', element: <Chat/>, auth: true},
     {path: '/about', element: <About/>, exact: true, auth: false},
     {path: '/error', element: <Error/>, exact: true, auth: false}
 ];

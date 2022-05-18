@@ -238,8 +238,8 @@ export default class UserController {
                             .required(),
             housingСlass: Joi.array()
                                 .min(0)
-                                .max(3)
-                                .items(Joi.number().integer().min(1).max(3))
+                                .max(4)
+                                .items(Joi.number().integer().min(1).max(4))
                                 .required(),
             typeOfBuilding: Joi.array()
                                 .min(0)

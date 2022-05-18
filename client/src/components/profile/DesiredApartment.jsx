@@ -88,12 +88,16 @@ const DesiredApartment = props => {
             value: 1
         },
         {
-            label: "Бизнес",
+            label: "Комфорт",
             value: 2
         },
         {
-            label: "Элитное",
+            label: "Бизнес",
             value: 3
+        },
+        {
+            label: "Элитное",
+            value: 4
         },
     ];
     const repairs = [

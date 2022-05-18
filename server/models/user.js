@@ -1,6 +1,5 @@
 import neo4j from 'neo4j-driver';
 import LocationServices from '../service/location-service.js';
-import ConvertService from '../service/convert-service.js';
 const {
     url_db,
     username_db,
@@ -10,11 +9,9 @@ const {
 
 const driver = neo4j.driver(url_db,
                   neo4j.auth.basic(username_db, password), 
-                  { disableLosslessIntegers: true },
-                  {/* encrypted: 'ENCRYPTION_OFF' */});
+                  { disableLosslessIntegers: true });
 
 const findByCityId = async (idCity, limit) => {
-    // console.log(idCity, limit);
     const session = driver.session({ database });
     const result = await session.run(`MATCH (country:Country {code: "RUS"})-[r:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(u:User)-[s1:INCLUDES]->(d:DesiredApartment) return u, d` + (limit ? ` limit ${Math.abs(Math.trunc(+limit))}` : ''), 
                                       {
@@ -150,8 +147,6 @@ const pushEstimatedRecommendByCityIdByUserId = async (idCity, idUser, idRatedUse
   return result.records;
 }
 const findUsersByCityIdByUserId = async (idCity, idUser, relevanceRange, limit) => {
-  console.log("321");
-  console.log(relevanceRange);
   const session = driver.session({ database });
   const result = await session.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user:User {_id : $idUser})-[r:RELEVANCE]->(u: User)-[s1:INCLUDES]->(d:DesiredApartment) WHERE r.coefficient >= toFloat($relevanceRange[0]) AND r.coefficient <= toFloat($relevanceRange[1]) 
                                     RETURN u, d ORDER BY r.coefficient DESC` + (limit ? ` limit ${Math.abs(Math.trunc(+limit))}` : ''),

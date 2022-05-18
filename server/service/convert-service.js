@@ -3,7 +3,6 @@ import Fs from 'fs';
 
 export default class ConvertService {
     static __dirname = path.resolve();
-    // estimatedScore
     static convertDataDbObjToClientSimplifiedObj(records){
         const result = [];
         for (let i = 0; i < records.map(i => i.get('u')).length; i++){
@@ -133,5 +132,48 @@ export default class ConvertService {
                 return record.get('realScore');
         }
         return 0;
+    }
+    static convertChannelMessagesDbObjToClientObj(idUser, records) {
+        const result = [];
+        const roomsSet = new Set();
+        for (const record of records){
+            if (record.get('channel').properties._id) roomsSet.add(record.get('channel').properties._id);
+        }
+        roomsSet.forEach(el => {
+            let messages = [];
+            result.push({_id: el, messages});
+        })
+        for (const record of records){
+            let channelIndex = result.findIndex(el => el._id === record.get('channel').properties._id);
+            console.log(channelIndex, result, record.get('channel').properties._id);
+            if (channelIndex >= 0) {
+                result[channelIndex] = {...result[channelIndex], ...record.get('channel').properties}
+                if (record.get('user2').properties._id && idUser) {
+                    const pathAvatarUser = path.join(record.get('user2').properties._id, "images-avatar", record.get('user2').properties.image);
+                    result[channelIndex].participants = {
+                        id: record.get('user2').properties._id,
+                        username: record.get('user2').properties.username,
+                        dateOfBirth: record.get('user2').properties.birthdate,
+                        image: {
+                            file: '',
+                            imagePreviewUrl: Fs.existsSync(this.__dirname + '/files/' + pathAvatarUser) ? pathAvatarUser : ''
+                        },
+                    }
+                    // result[channelIndex].messages = [];
+                }
+                if (record.get('message1')){
+                    result[channelIndex].messages.push({...record.get('message1').properties, idOwner: idUser});
+                }
+                if (record.get('message2')){
+                    result[channelIndex].messages.push({...record.get('message2').properties, idOwner: record.get('user2').properties._id});
+                }
+                result[channelIndex].messages.sort((a, b) => a.createdDate - b.createdDate);
+                // console.log("ms");
+                // console.log(record.get('message1'), record.get('message2'));
+    
+            }
+        }
+        console.log();
+        return result;
     }
 }
