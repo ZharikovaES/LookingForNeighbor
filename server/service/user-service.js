@@ -15,9 +15,9 @@ export default class UserService{
         data.user.activationLink = uuidv4();
         const records = await userModel.create(data.location, data.user, data.searchedUser, data.apartment);
         const { location, user, searchedUser, apartment } = ConvertService.convertDataDbObjToClientObj(records);
-        delete user.password;
-        delete user.accessToken;
-        delete user.refreshToken;
+        // delete user.password;
+        // delete user.accessToken;
+        // delete user.refreshToken;
         await MailService.sendActivationMail(user.email, process.env.API_URL + 'api/activate/' + data.location.city.idKladr + "/" + user.activationLink);
         const tokens = TokenService.generateTokens({...location, ...user});
         await TokenService.saveToken(location, user.id, tokens.refreshToken);
@@ -35,9 +35,9 @@ export default class UserService{
         if (!user) throw ApiError.BadRequest('Пользователь с таким email не найден');
         const isPassEquals = await bcrypt.compare(password, user.password);
         if (!isPassEquals) throw ApiError.BadRequest('Неверный пароль');
-        delete user.password;
-        delete user.accessToken;
-        delete user.refreshToken;
+        // delete user.password;
+        // delete user.accessToken;
+        // delete user.refreshToken;
         const tokens = TokenService.generateTokens({...location, ...user});
         await TokenService.saveToken(location, user.id, tokens.refreshToken);
         return {...tokens, location, user, searchedUser, apartment};
@@ -88,7 +88,8 @@ export default class UserService{
 
     static async getSimplifiedUsersByCityIdByUserIdByLimit(cityId, userId, typeContent, typeOfSimilarity, matchByParameters, relevanceRange, limit){
         let result = null;
-        if (typeOfSimilarity === 0)
+        console.log(cityId, userId, typeContent, typeOfSimilarity, matchByParameters, relevanceRange, limit);
+        if (typeOfSimilarity === 0) {
             if (matchByParameters === 0) {
                 if (typeContent === 0){
                     const records = await userModel.findUsersByCityIdByUserId(cityId, userId, relevanceRange, limit);
@@ -122,10 +123,13 @@ export default class UserService{
             
                 }
             }
+        }
         else if (typeOfSimilarity === 1){
             if (typeContent === 0){
                 const records = await userModel.findUsersByCityIdByUserIdByEstimatedScore(cityId, userId, relevanceRange, limit);
-                result = ConvertService.convertDataDbObjToClientSimplifiedObj(records);
+                console.log("EstimatedScore");
+                console.log(records);        
+                result = ConvertService.convertDataDbObjToClientSimplifiedObjE(records);
             } else if (typeContent === 1){
                 const records = await userModel.findUsersByCityIdByUserIdByEstimatedScore(cityId, userId, relevanceRange, limit);
                 result = ConvertService.convertDataDbObjToClientSimplifiedObj(records);
@@ -134,7 +138,8 @@ export default class UserService{
             }
 
         }
-        // console.log(result);
+        console.log(44);
+
         return result;
     }
     static async pushNewRatingToUser(data){

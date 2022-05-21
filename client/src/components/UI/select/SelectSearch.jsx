@@ -32,13 +32,14 @@ const SelectSearch = props => {
         <div>
             { props.label && (<label>{ props.label }</label>) }
             <Select
+                defaultValue={props.value}
                 isLoading={isLoading}
                 isClearable={true}
                 isSearchable={true}
                 isDisabled={ props.disabled }
                 options={ options }
                 placeholder={props.placeholder}
-                value={ options.find( el => el.value === props.value) }
+                value={ options.find( el => el.value === props.value) || {value: props.value, name: props.name} }
                 onInputChange={changeInputValue}
                 onChange={changeSelect}
             />

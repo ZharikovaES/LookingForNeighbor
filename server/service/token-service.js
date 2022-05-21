@@ -36,7 +36,6 @@ export default class TokenService{
             let userDB = records.map(i => i.get('user').properties)[0];    
             userDB.refreshToken = refreshToken;
             userModel.updateUser(locationDB, userDB);
-
         // }
         return userDB.refreshToken;
     }

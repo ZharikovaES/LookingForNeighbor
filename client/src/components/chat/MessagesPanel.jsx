@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import Message from "./Message";
 import classes from "./MessagesPanel.module.css"
 
-const MessagesPanel = ({ channel, handleSendMessage, refMessagesList}) => {
+const MessagesPanel = ({ messages, channel, handleSendMessage, refMessagesList}) => {
     const [currentTextOfInput, setCurrentTextOfInput] = useState('');
+    // console.log(messages);
     return (
         <div className={classes.messagesPanel}>
             <div className={classes.messagesList} ref={refMessagesList}>{
-                !channel?.messages?.length ? (<div className={classes.noContentMessage}>There is no messages to show</div>) : 
-                channel?.messages.map(el => {
+                !messages?.length ? (<div className={classes.noContentMessage}>Сообщения отсутствуют</div>) : 
+                messages.map(el => {
                     const checkEqualId = el.idOwner === channel.participants.id;
                     return <Message key={el._id} id={el._id} className={checkEqualId ? classes.left : classes.right} username={checkEqualId ? channel.participants.username : "Вы"} text={el.text}/>
                 })}</div>

@@ -6,10 +6,6 @@ import ConvertService from './convert-service.js';
 
 export default class ChatService {
     static __dirname = path.resolve();
-    //getChannels
-    static async getChannels(cityId, userId){
-        
-    }
     static async createChannel(cityId, currentUserId, userId){
         await chatModel.createChannelByCityIdByUserId(cityId, currentUserId, userId);
     }
@@ -17,32 +13,25 @@ export default class ChatService {
         socket.leave(oldChannelId);
         socket.join(newChannelId);
     }
-
-    static async getChannelsByCityIdByUserId(socket, { cityId, currentUserId, userId=null }){
-        if (userId) {
-            let currentChannelId = await chatModel.createChannelByCityIdByUserId(cityId, currentUserId, userId);
-            const result = ConvertService.convertChannelMessagesDbObjToClientObj(currentUserId, await chatModel.findByCityIdByUserId(cityId, currentUserId));
-            console.log("check");
-            console.log(result, currentChannelId, socket.id);
-            socket.join(currentChannelId);
-            socket.emit("set channels and current channel", result, currentChannelId);    
-        } else {
-            const result = ConvertService.convertChannelMessagesDbObjToClientObj(currentUserId, await chatModel.findByCityIdByUserId(cityId, currentUserId));
-            socket.emit("set channels", result);    
-
-        }
+    static async getChannelsAndMessagesByCityIdByUserId(socket, { cityId, currentUserId, channelId }){
+        const result = ConvertService.convertChannelMessagesDbObjToClientObj(currentUserId, await chatModel.findByCityIdByUserId(cityId, currentUserId));
+        socket.emit("set channel and messages", result.find(el => el._id === channelId).messages, channelId);    
+    }
+    static async createChannelByUserIdAndGetChannelsByCityIdByUserId(socket, { cityId, currentUserId, userId }){
+        let currentChannelId = await chatModel.createChannelByCityIdByUserId(cityId, currentUserId, userId);
+        const result = ConvertService.convertChannelMessagesDbObjToClientObj(currentUserId, await chatModel.findByCityIdByUserId(cityId, currentUserId));
+        socket.join(currentChannelId);
+        socket.emit("set channels and current channel", result, currentChannelId);    
+    }
+    static async getChannelsByCityIdByUserId(socket, { cityId, currentUserId }){
+        const result = ConvertService.convertChannelMessagesDbObjToClientObj(currentUserId, await chatModel.findByCityIdByUserId(cityId, currentUserId));
+        socket.emit("set channels", result);    
     }
     static async pushNewMessageByCityIdByUserIdByChannelId(socket, { cityId, channelId, userId, text }){
         if (cityId && channelId && userId && text){
             await chatModel.createMessageByCityIdByUserIdByChannelId(cityId, userId, channelId, text.substr(0, 200));
             const result = ConvertService.convertChannelMessagesDbObjToClientObj(userId, await chatModel.findByCityIdByUserId(cityId, userId));
-            console.log("messages");
-            console.log(result[0].messages);
-            io.to(channelId).emit("set message", result);
+            io.to(channelId).emit("set message", result.find(el => el._id === channelId).messages, channelId);
         }
-        // const result = ConvertService.convertChannelMessagesDbObjToClientObj(currentUserId, await chatModel.findByCityIdByUserId(cityId, currentUserId));
-        // console.log("check");
-        // console.log(result, currentChannelId);
-        // socket.emit("set channels", result, currentChannelId);
     }
 }

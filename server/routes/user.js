@@ -9,6 +9,7 @@ user.get('/users/:cityId/:userId/:currentUserId', userController.getUserById);
 
 user.post('/user/rating', userController.postNewRating );
 user.post('/login', userController.login);
+user.post('/registration', userController.registration);
 user.post('/logout', userController.logout);
 
 user.get('/activate/:city/:link', userController.activate);

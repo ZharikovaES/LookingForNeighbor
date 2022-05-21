@@ -10,18 +10,25 @@ import { URL } from '../../http';
 
 const Chat = () => {
     const { store } = useContext(Context);
+    const params = useParams();
+    const refMessagesList = useRef(null);
 
     const [channels, setChannels] = useState([]);
+    const [currentMessages, setCurrentMesssages] = useState([]);
     const [oldChannelId, setOldChannelId] = useState(null);
     const [currentChannelId, setCurrentChannelId] = useState(null);
-    const params = useParams();
     const [socket, setSocket] = useState(null);
-    const refMessagesList = useRef(null)
+
     const handleSendMessage = (text) => {
         if (text) socket.emit('push message', {cityId: store.location.city.idKladr, channelId: currentChannelId, userId: store.user.id, text})
     }
-    const messageListener = (channels) => {
-        setChannels([...channels]);
+    const messageAndChannelListener = (messages, channelId) => {
+        setCurrentChannelId(channelId);
+        setCurrentMesssages([...messages]);
+                refMessagesList.current.scrollTop = refMessagesList.current.scrollHeight;
+    }
+    const messageListener = (messages, channelId) => {
+        setCurrentMesssages([...messages]);
         refMessagesList.current.scrollTop = refMessagesList.current.scrollHeight;
     };
     useEffect(() => {
@@ -37,18 +44,17 @@ const Chat = () => {
         const channelsListener = (channels, id) => {
             setCurrentChannelId(id);
             setChannels([...channels]);
+            setCurrentMesssages([...channels.find(el => el._id === id).messages]);
             refMessagesList.current.scrollTop = refMessagesList.current.scrollHeight;
         };
-        socket.on('set channels and current channel', (...param) => { 
-            channelsListener(param[0], param[1])
-        });
+        socket.on('set channels and current channel', channelsListener);
         socket.on('set channels', channels => { 
             setChannels([...channels]);
+            if (currentChannelId)
+                setCurrentMesssages([...channels.find(el => el._id === currentChannelId).messages]);
         });
-
-        socket.on('set message', (param) => {
-            messageListener(param)
-        });
+        socket.on('set channel and messages', messageAndChannelListener);
+        socket.on('set message', messageListener);
         if (params.userId)
             socket.emit('create new chanel and get channels', { cityId: params.cityId, currentUserId: store.user.id, userId: params.userId });
         else socket.emit('get channels', { cityId: params.cityId, currentUserId: store.user.id });
@@ -57,13 +63,14 @@ const Chat = () => {
         return () => socket.close();
     }, []);
     const changeCurrentChannelId = newCurrentChannelId => {
-        setCurrentChannelId(newCurrentChannelId);
+        setOldChannelId(currentChannelId);
+        socket.emit('get channels and messages', { cityId: params.cityId, currentUserId: store.user.id, channelId: newCurrentChannelId });
     }
 
     return (
         <div className={[classes.chat, "height-full"].join(' ')}>
             <ChannelList currentChannelId={currentChannelId} channels={channels} handelClick={changeCurrentChannelId}/>{
-            currentChannelId && <MessagesPanel channel={channels.find(el => el._id === currentChannelId)} handleSendMessage={handleSendMessage} refMessagesList={refMessagesList}/>
+            currentChannelId && <MessagesPanel messages={currentMessages} channel={channels.find(el => el._id === currentChannelId)} handleSendMessage={handleSendMessage} refMessagesList={refMessagesList}/>
             }
         </div>
     );

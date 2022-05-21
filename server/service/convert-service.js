@@ -30,10 +30,37 @@ export default class ConvertService {
         }
         return result;
     }
+    static convertDataDbObjToClientSimplifiedObjE(records){
+        const result = [];
+        for (let i = 0; i < records.map(i => i.get('user2')).length; i++){
+            const user = records.map(i => i.get('user2'))[i].properties;
+            const desiredApartment = records.map(i => i.get('d'))[i].properties;
+            const pathAvatarUser = path.join(user._id, "images-avatar", user.image);
+            let estimatedScore = 0;
+            records.forEach(i => {
+                if (i.has('estimatedScore') && user._id === i.get('user2Id')){
+                    estimatedScore = i.get('estimatedScore')
+                }
+            })
+            result.push({
+                id: user._id,
+                username: user.username,
+                dateOfBirth: user.birthdate,
+                gender: user.gender,
+                estimatedScore: estimatedScore,
+                image: {
+                    file: '',
+                    imagePreviewUrl: Fs.existsSync(this.__dirname + '/files/' + pathAvatarUser) ? pathAvatarUser : ''
+                },
+                coordinatesPlaces: desiredApartment.coordinatesPlaces ?? [],
+                labelsPlaces: desiredApartment.labelsPlaces ?? []
+            });
+        }
+        return result;
+    }
+
     static convertDataDbObjToClientObj(records){
         try{
-            console.log("records");
-            console.log(records);
             let location = { city: records.map(i => i.get('city').properties)[0] };
             let user = records.map(i => i.get('user').properties)[0];
             let searchedUser = records.map(i => i.get('searchInfo').properties)[0];
@@ -42,8 +69,6 @@ export default class ConvertService {
                 if (i.has('realScore'))
                     return i.get('realScore')
             })[0] || 0;
-            console.log("realScore");     
-            console.log(realScore);     
             location = {
                 country: {
                     id: 1
@@ -101,8 +126,6 @@ export default class ConvertService {
         
     }
     static convertDataDbObjToMatrix(records){
-        console.log(123);
-        // console.log(records);
         const setUser1 = new Set();
         const setUser2 = new Set();
         records.forEach(i => {
@@ -111,9 +134,6 @@ export default class ConvertService {
         });
         let vectorUser1 = Array.from(setUser1);
         let vectorUser2 = Array.from(setUser2);
-        console.log("vectorUser1, vectorUser2");
-        console.log(vectorUser1, vectorUser2);
-        // vectorUser1 = vectorUser1.slice(0, vectorUser2.length);
         if (!vectorUser1.length || !vectorUser2.length) return;
         const matrix = [];
         for (let i = 0; i < vectorUser1.length; i++) {
@@ -122,8 +142,6 @@ export default class ConvertService {
                 matrix[i][j] = this.getScoreByUserId(records, vectorUser1[i], vectorUser2[j]);
             }
         }
-        console.log("matrix");
-        // console.log(matrix);
         return {vectorUser1, vectorUser2, matrix};
     }
     static getScoreByUserId(records, user1Id, user2Id){
@@ -145,7 +163,6 @@ export default class ConvertService {
         })
         for (const record of records){
             let channelIndex = result.findIndex(el => el._id === record.get('channel').properties._id);
-            console.log(channelIndex, result, record.get('channel').properties._id);
             if (channelIndex >= 0) {
                 result[channelIndex] = {...result[channelIndex], ...record.get('channel').properties}
                 if (record.get('user2').properties._id && idUser) {
@@ -159,21 +176,18 @@ export default class ConvertService {
                             imagePreviewUrl: Fs.existsSync(this.__dirname + '/files/' + pathAvatarUser) ? pathAvatarUser : ''
                         },
                     }
-                    // result[channelIndex].messages = [];
                 }
                 if (record.get('message1')){
-                    result[channelIndex].messages.push({...record.get('message1').properties, idOwner: idUser});
+                    if (result[channelIndex].messages.findIndex(el => record.get('message1').properties._id == el._id) < 0)
+                        result[channelIndex].messages.push({...record.get('message1').properties, idOwner: idUser});
                 }
                 if (record.get('message2')){
-                    result[channelIndex].messages.push({...record.get('message2').properties, idOwner: record.get('user2').properties._id});
+                    if (result[channelIndex].messages.findIndex(el => record.get('message2').properties._id == el._id) < 0)
+                        result[channelIndex].messages.push({...record.get('message2').properties, idOwner: record.get('user2').properties._id});
                 }
                 result[channelIndex].messages.sort((a, b) => a.createdDate - b.createdDate);
-                // console.log("ms");
-                // console.log(record.get('message1'), record.get('message2'));
-    
             }
         }
-        console.log();
         return result;
     }
 }

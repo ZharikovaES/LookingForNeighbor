@@ -24,7 +24,7 @@ const Map = props => {
     }, [props.groupItems]);
     const [ymaps, setYMaps] = useState(null);
     window.openItem = userId => {
-        navigate(`/users/${store.location.city.idKladr}/${userId}`)
+        navigate(`/users/${store.location.city.idKladr}/${userId}/${store.user.id}`)
     };
 
     window.addItem = userId => {
@@ -53,7 +53,7 @@ const Map = props => {
                                 key={el.key} 
                                 geometry={el.coordinates} 
                                 properties={{
-                                    clusterCaption: el.item.username + (el.item.estimatedScore ? `${el.item.estimatedScore}%` : ''),
+                                    clusterCaption: el.item.username + (el.item.estimatedScore ? ` ${el.item.estimatedScore}` : ''),
                                     balloonContentBody: renderToString(<BalloonContentBody
                                                                             userId={el.item.id}
                                                                             username={el.item.username}

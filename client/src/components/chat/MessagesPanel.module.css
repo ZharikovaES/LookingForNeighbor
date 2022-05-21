@@ -24,6 +24,7 @@
     flex-direction: column;
     overflow-y: auto;
     padding: 5px;
+    min-height: calc(100% - 40px);
 }
 
 .messagesInput {
@@ -68,7 +69,13 @@
     padding: 5px;
     background-color: #cccccc;
     border-radius: 10px;
+    overflow-y: hidden;
 }
+.messageItem div{
+    /* overflow-y: hidden; */
+    word-wrap: break-word;
+}
+
 .messageItem + .messageItem{
     margin-top: 5px;
 }

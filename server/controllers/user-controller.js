@@ -275,10 +275,13 @@ export default class UserController {
                 formData.imageUser.name = data.user.image.imagePreviewUrl = Date.now() + "-" + formData.imageUser.name.replace(/\s+/gi, "-");
             // if (!errors.isEmpty()) throw ApiError.BadRequest('Ошибка при валидации', errors.array());
             const result = await UserService.registration(data);
+
+            console.log(result);
+            // console.log(result.user.id, formData.imageUser);
             if (result.user.id && formData.imageUser) await FileService.uploadFile(result.user.id, formData.imageUser);
 
             res.cookie('refreshToken', result.refreshToken, { maxAge: 30 * 24* 3600, httpOnly: true });
-            delete result.refreshToken;
+            // delete result.refreshToken;
             res.status(201).json(result);
         } catch (error) {
             next(error);
@@ -352,6 +355,7 @@ export default class UserController {
             let result = {};
             if (cityId && userId && currentUserId) result = await UserService.getUserByCityIdByUserId(cityId, userId, currentUserId);
             else result = {};
+            console.log(result);
             res.json(result);    
         } catch (error){
             next(error);
