@@ -1,5 +1,3 @@
-// import { connectToRoom, disconnect, getActiveEmptyCell, getMovingChecker, getPlayers, completingConnectionToRoom, removeEatingCheckers } from '../connect-controller.js';
-
 import ChatService from "../service/chat-service.js";
 
 export const connection = socket => {        
@@ -19,7 +17,6 @@ export const connection = socket => {
         ChatService.getChannelsAndMessagesByCityIdByUserId(socket, data);
     });
     socket.on("disconnect", () => {
-        disconnect(socket);
     });
 }
 
