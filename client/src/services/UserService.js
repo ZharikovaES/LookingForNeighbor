@@ -11,10 +11,10 @@ export default class UserService {
             result = response.data;
         return result;
     }
-    static async postRatingFromUser(cityId, userId, ratedUserId, newRating){
+    static async postRatingFromUser(cityId, userId, ratedUserId, newRating, indexOfRating){
         let result = null;
         const response = await $api.post(API_URL + `user/rating`, {
-                                                cityId, userId, ratedUserId, newRating
+                                                cityId, userId, ratedUserId, newRating, indexOfRating
                                             });
         if (response.data)
             result = response.data;

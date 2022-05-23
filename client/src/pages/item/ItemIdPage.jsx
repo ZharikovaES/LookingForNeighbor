@@ -7,28 +7,42 @@ import { URL } from "../../http";
 import classes from "./ItemPage.module.css";
 import { Context } from "../..";
 import defaultImage from "../../assets/img/profile-default.png"
+import MultiRating from "../../components/UI/rating/MultiRating";
 
 const ItemIdPage = () => {
     const { store } = useContext(Context);
-    const [item, setIem] = useState({realScore: 0});
+    const [item, setIem] = useState({ realScore: [0, 0, 0, 0, 0, 0, 0, 0] });
     // const [rating, setRating] = useState(0);
     const params = useParams();
     useEffect(async () => {
         const data = await UserService.fetchUserByCityIdByUserId(params.cityId, params.userId, store.user.id);
         console.log(data);
-        setIem({ ...data, realScore: data.realScore * 20 });
+        setIem({ ...data, realScore: data.realScore.map(el => el * 20) });
     }, []);
+    const labelsRatingUser = [
+        "По вредным привычкам",
+        "По профессии",
+        "По образованию",
+        "По указанным характеристикам и религиозным предпочтения",
+        "По отношению к детям и к животным",
+        "По доступному бюджету",
+        "По указанным характеристикам искомой квартиры",
+        "По указанным характеристикам дома, в которой должна находиться искомая квартира"
+    ];
+    const handleChange = (val, index) => {
+        const realScore = item.realScore;
+        realScore[index] = val;
+        setIem({ ...item, realScore: [...realScore] });
+        UserService.postRatingFromUser(item.location.city.idKladr, store.user.id, item.user.id, val / 20, index);
+    }
 
     return (
         <div className="container">
-            <label>На сколько данный пользователь вам подходит? Оцентие.</label>
-            <Rating
-                ratingValue={item.realScore}
-                onClick={(val) => {
-                    console.log(val/20);
-                    setIem({ ...item, realScore: val });
-                    UserService.postRatingFromUser(item.location.city.idKladr, store.user.id, item.user.id, val / 20);
-                }}
+            <MultiRating
+                label="На сколько данный пользователь вам подходит? Оцените."
+                labels={labelsRatingUser}
+                values={item.realScore}
+                handleChange={handleChange}
             />
             {item?.user && item?.apartment &&
             <table>

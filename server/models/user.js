@@ -34,7 +34,7 @@ const findByCityIdByUserIdRating = async (idCity, idUser, idCurrentUser) => {
   const result = await session.run(`MATCH (country:Country {code: "RUS"})-[r:INCLUDES]->(city:City {idKladr: "${idCity}"})-[s:INCLUDES]->(user:User {_id : "${idUser}"})-[s1:INCLUDES]->(searchInfo: SearchInfo) WITH city, user, searchInfo
                                     MATCH (user)-[s2:INCLUDES]->(desiredApartment: DesiredApartment) WITH city, user, searchInfo, desiredApartment
                                     OPTIONAL MATCH (userFrom:User{_id: $idCurrentUser})-[r:RATING]->(user) 
-                                    RETURN city, user, searchInfo, desiredApartment, toInteger(r.realScore) AS realScore`, {
+                                    RETURN city, user, searchInfo, desiredApartment, r.realScore AS realScore`, {
                                       idCurrentUser
                                     });
   await session.close();
@@ -93,20 +93,18 @@ const deleteRefreshTokenByCityIdById = async (idCity, idUser) => {
   return result.records.map(i => i.get('u').properties)[0];
 }
 
-const pushNewRatingByCityIdByUserId = async (idCity, idUser, idRatedUser, newRating) => {
-  console.log(idCity, idUser, idRatedUser, newRating);
+const pushNewRatingByCityIdByUserId = async (idCity, idUser, idRatedUser, newRating, indexOfRating) => {
   const session = driver.session({ database });
   const result = await session.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user1:User {_id : $idUser}) WITH user1 AS userFrom
                                     MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user2:User {_id : $idRatedUser}) WITH userFrom, user2 AS userTo
-                                    MERGE ((userFrom)-[r:RATING]->(userTo))
-                                       SET r.realScore = $newRating
+                                    MERGE (userFrom)-[r:RATING]->(userTo)
+                                       SET r.realScore = r.realScore[0..toInteger($indexOfRating)] + $newRating + r.realScore[toInteger($indexOfRating + 1)..8]
                                     RETURN r.realScore, userTo._id`,
                                     {
-                                      idCity, idUser, idRatedUser, newRating
+                                      idCity, idUser, idRatedUser, newRating, indexOfRating
                                     });
 
   await session.close();
-  console.log(result.records);
   return result.records;
 }
 

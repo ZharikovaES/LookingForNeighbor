@@ -68,7 +68,7 @@ export default class ConvertService {
             let realScore = records.map(i => {
                 if (i.has('realScore'))
                     return i.get('realScore')
-            })[0] || 0;
+            })[0] || [0, 0, 0, 0, 0, 0, 0, 0];
             location = {
                 country: {
                     id: 1
@@ -119,7 +119,7 @@ export default class ConvertService {
             };
             return { location, user, searchedUser, apartment, realScore };    
         } catch(e){
-            return { location: null, user: null, searchedUser: null, apartment: null, realScore: 0 };    
+            return { location: null, user: null, searchedUser: null, apartment: null, realScore: [0, 0, 0, 0, 0, 0, 0, 0] };    
         }
     }
     static convertDataClientObjToDbObj(records){
