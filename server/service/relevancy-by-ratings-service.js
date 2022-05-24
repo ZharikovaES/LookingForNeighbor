@@ -5,9 +5,9 @@ import userModel from "../models/user.js";
 import ConvertService from "./convert-service.js";
 
 export default class RelevanceByRatingService{
-    static async createMatrix(cityId, userId){
-        const result = await userModel.findUsersAndRatingByCityIdByUserId(cityId, userId);
-        let { vectorUser1, vectorUser2, matrix} = ConvertService.convertDataDbObjToMatrix(result);
+    static async createMatrix(cityId, userId, indexType){
+        const result = await userModel.findUsersAndRatingByCityIdByUserId(cityId, userId, indexType);
+        let { vectorUser1, vectorUser2, matrix } = ConvertService.convertDataDbObjToMatrix(result, indexType);
         const index = vectorUser1.indexOf(userId);
         vectorUser2 = [...vectorUser2.slice(0, vectorUser1.length)];
         if (vectorUser1.length >= 10) {
@@ -16,7 +16,7 @@ export default class RelevanceByRatingService{
             let recommend = this.createRecommend(matrix, 0, 100);
             for (let i = 0; i < recommend.length; i++){
                 let index = parseInt(recommend[i][0])
-                userModel.pushEstimatedRecommendByCityIdByUserId(cityId, userId, vectorUser2[index], recommend[i][1]);
+                userModel.pushEstimatedRecommendByCityIdByUserId(cityId, userId, vectorUser2[index], recommend[i][1], indexType);
             }
         }
 
@@ -41,6 +41,7 @@ export default class RelevanceByRatingService{
 
     static svdEast(arr, userId, itemId, n, percentage = 0.9){
         let simTotal = 0.0, ratSimTotal = 0.0;
+        console.log(arr);
         let { u, q: sigma } = SVD(arr);
         let k = this.sigmaPct(sigma, percentage);
         sigma = sigma.slice(0, k);
@@ -51,6 +52,8 @@ export default class RelevanceByRatingService{
         }
         u = u.map((el) => el.slice(0, k));
         const matrix = new Matrix(arr);
+        console.log(sigmaK);
+        console.log(u);
         const xformedItems = matrix.transpose().mmul(new Matrix(u)).mmul(inverse(new Matrix(sigmaK)));
         const columnsSize = xformedItems.columns;
         let vectorItem = [];

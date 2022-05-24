@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Range, getTrackBackground } from "react-range";
 
-const RangeTwoValues = ({style, hasMarks, label, step, min, max, values, handleChange}) => {
+const RangeTwoValues = ({style, hasMarks, label, step, min, max, values, handleChange, className}) => {
   const [currentValues, setCurrentValues] = useState(values);
   const [minValueNumInput, setMinValueNumInput] = useState(parseFloat(values[0]));
   const [maxValueNumInput, setMaxValueNumInput] = useState(parseFloat(values[1]));
@@ -11,7 +11,7 @@ const RangeTwoValues = ({style, hasMarks, label, step, min, max, values, handleC
   }, [ values[1] ])
 
   return (
-    <div>
+    <div className={className}>
       { label && (<label>{label}</label>) }
       <div style={{margin: "40px"}}>
         <Range
@@ -32,7 +32,7 @@ const RangeTwoValues = ({style, hasMarks, label, step, min, max, values, handleC
                         ...props.style,
                         height: '16px',
                         width: '5px',
-                        backgroundColor: index * step > currentValues[0] && index * step < currentValues[1] ? '#548BF4' : '#ccc'
+                        backgroundColor: index * step >= currentValues[0] && index * step < currentValues[1] ? '#548BF4' : '#ccc'
                     }}
                 />
               ) : null}

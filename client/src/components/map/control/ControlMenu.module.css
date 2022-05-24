@@ -1,11 +1,11 @@
 .controlMenu{
-    max-height: calc(100vh - 40px);
-    border-radius: 0 0 20px 0;
+    height: 100vh;
     border-top: 0 !important;
     border-left: 0 !important;
     padding-left: 10px;
     padding-right: 10px;
 }
 .controlMenuAside{
+    height: calc(100vh - 80px);
     padding-bottom: 10px;
 }

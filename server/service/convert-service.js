@@ -125,7 +125,7 @@ export default class ConvertService {
     static convertDataClientObjToDbObj(records){
         
     }
-    static convertDataDbObjToMatrix(records){
+    static convertDataDbObjToMatrix(records, indexType){
         const setUser1 = new Set();
         const setUser2 = new Set();
         records.forEach(i => {
@@ -139,15 +139,17 @@ export default class ConvertService {
         for (let i = 0; i < vectorUser1.length; i++) {
             matrix.push(new Array(vectorUser2.length));
             for (let j = 0; j < vectorUser2.length; j++){
-                matrix[i][j] = this.getScoreByUserId(records, vectorUser1[i], vectorUser2[j]);
+                matrix[i][j] = this.getScoreByUserId(records, vectorUser1[i], vectorUser2[j], indexType);
             }
         }
-        return {vectorUser1, vectorUser2, matrix};
+        return { vectorUser1, vectorUser2, matrix };
     }
-    static getScoreByUserId(records, user1Id, user2Id){
+    static getScoreByUserId(records, user1Id, user2Id, indexType){
         for (const record of records){
-            if (record.get('user1Id') === user1Id && record.get('user2Id') === user2Id)
-                return record.get('realScore');
+            if (record.get('user1Id') === user1Id && record.get('user2Id') === user2Id) {
+                console.log(record.get('realScore'));
+                return record.get('realScore')[indexType];
+            }
         }
         return 0;
     }

@@ -85,9 +85,9 @@ export default class UserService{
         return result;
     }
 
-    static async getSimplifiedUsersByCityIdByUserIdByLimit(cityId, userId, typeContent, typeOfSimilarity, matchByParameters, relevanceRange, limit){
+    static async getSimplifiedUsersByCityIdByUserIdByLimit(cityId, userId, typeContent, typeOfSimilarity, matchByParameters, relevanceRange, typeOfRating, scoreRange, limit){
         let result = null;
-        // console.log(cityId, userId, typeContent, typeOfSimilarity, matchByParameters, relevanceRange, limit);
+        console.log(scoreRange);
         if (typeOfSimilarity === 0) {
             if (matchByParameters === 0) {
                 if (typeContent === 0){
@@ -125,13 +125,21 @@ export default class UserService{
         }
         else if (typeOfSimilarity === 1){
             if (typeContent === 0){
-                const records = await userModel.findUsersByCityIdByUserIdByEstimatedScore(cityId, userId, relevanceRange, limit);
-                // console.log("EstimatedScore");
-                // console.log(records);        
-                result = ConvertService.convertDataDbObjToClientSimplifiedObjE(records);
+                if (typeOfRating === 0) {
+                    const records = await userModel.findUsersByCityIdByUserIdByEstimatedScore(cityId, userId, scoreRange, limit);
+                    result = ConvertService.convertDataDbObjToClientSimplifiedObjE(records);    
+                } else {
+                    const records = await userModel.findUsersByCityIdByUserIdByEstimatedScoreByTypeOfRating(cityId, userId, scoreRange, typeOfRating - 1, limit);
+                    result = ConvertService.convertDataDbObjToClientSimplifiedObjE(records);    
+                }
             } else if (typeContent === 1){
-                const records = await userModel.findUsersByCityIdByUserIdByEstimatedScore(cityId, userId, relevanceRange, limit);
-                result = ConvertService.convertDataDbObjToClientSimplifiedObj(records);
+                if (typeOfRating === 0) {
+                    const records = await userModel.findUsersByCityIdByUserIdByEstimatedScore(cityId, userId, scoreRange, limit);
+                    result = ConvertService.convertDataDbObjToClientSimplifiedObjE(records);    
+                } else {
+                    const records = await userModel.findUsersByCityIdByUserIdByEstimatedScoreByTypeOfRating(cityId, userId, scoreRange, typeOfRating - 1, limit);
+                    result = ConvertService.convertDataDbObjToClientSimplifiedObjE(records);    
+                }
             } else if (typeContent === 2){
         
             }
@@ -140,8 +148,8 @@ export default class UserService{
         return result;
     }
     static async pushNewRatingToUser(data){
-        const { cityId, userId, ratedUserId, newRating, indexOfRating } = data;
-        await userModel.pushNewRatingByCityIdByUserId(cityId, userId, ratedUserId, newRating, indexOfRating);
-        RelevanceByRatingService.createMatrix(cityId, userId);
+        const { cityId, userId, ratedUserId, newRating, typeOfRating } = data;
+        await userModel.pushNewRatingByCityIdByUserId(cityId, userId, ratedUserId, newRating, typeOfRating);
+        RelevanceByRatingService.createMatrix(cityId, userId, typeOfRating);
     }
 }

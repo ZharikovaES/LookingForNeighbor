@@ -14,14 +14,16 @@ const Home = () => {
     const [ filter, setFilter ] = useState({
                                                 typeOfSimilarity: 0,
                                                 typeContent: 0,
+                                                typeOfRating: 0,
                                                 matchByParameters: 0,
-                                                relevanceRange: [0.0, 1.0]
+                                                relevanceRange: [0.0, 1.0],
+                                                scoreRange: [1.0, 5.0]
                                             });
     useEffect(async () => {
         if (store.isAuth){
             // console.log(store);
             const simplifiedUsers = await UserService.getSimplifiedUsers({cityId: store.location.city.idKladr, userId: store.user.id, ...filter});
-            console.log(simplifiedUsers);
+            // console.log(simplifiedUsers);
             setSimplifiedUsers(simplifiedUsers.map(el => { return { ...el, coordinatesPlaces: el.coordinatesPlaces}}));
         } else {
             const simplifiedUsers = await UserService.getSimplifiedUsers({cityId: store.location.city.idKladr, ...filter});

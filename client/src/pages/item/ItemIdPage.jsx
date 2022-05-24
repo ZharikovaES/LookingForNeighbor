@@ -8,27 +8,17 @@ import classes from "./ItemPage.module.css";
 import { Context } from "../..";
 import defaultImage from "../../assets/img/profile-default.png"
 import MultiRating from "../../components/UI/rating/MultiRating";
+import { labelsRatingUser } from "../../assets/labels"
 
 const ItemIdPage = () => {
     const { store } = useContext(Context);
     const [item, setIem] = useState({ realScore: [0, 0, 0, 0, 0, 0, 0, 0] });
-    // const [rating, setRating] = useState(0);
     const params = useParams();
     useEffect(async () => {
         const data = await UserService.fetchUserByCityIdByUserId(params.cityId, params.userId, store.user.id);
         console.log(data);
         setIem({ ...data, realScore: data.realScore.map(el => el * 20) });
     }, []);
-    const labelsRatingUser = [
-        "По вредным привычкам",
-        "По профессии",
-        "По образованию",
-        "По указанным характеристикам и религиозным предпочтения",
-        "По отношению к детям и к животным",
-        "По доступному бюджету",
-        "По указанным характеристикам искомой квартиры",
-        "По указанным характеристикам дома, в которой должна находиться искомая квартира"
-    ];
     const handleChange = (val, index) => {
         const realScore = item.realScore;
         realScore[index] = val;

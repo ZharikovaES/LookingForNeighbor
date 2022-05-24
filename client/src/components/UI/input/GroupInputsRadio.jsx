@@ -7,11 +7,11 @@ const GroupInputsRadio = props => {
     }, [props.value])
 
     return (
-        <div>
-            { props.label && (<label>{ props.label }</label>) }
+        <div className={props.className}>
+            { props.label && (<label className="mb-1">{ props.label }</label>) }
             {
             currentValue.map((el, i) => 
-                <div className="form-check" key={ el.value }>
+                <div className="form-check" style={{ paddingLeft: "1.8em" }} key={ el.value }>
                     <input 
                         className="form-check-input"
                         name={ props.name } 
