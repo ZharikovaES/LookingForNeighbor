@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import React, { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Context } from '../..';
 import AuthenticationButton from '../UI/button/AuthenticationButton';
 import Input from '../UI/input/Input';
@@ -8,12 +9,18 @@ const LoginForm = props => {
     const { store } = useContext(Context);
     const [ email, setEmail ] = useState('');
     const [ password, setPassword ] = useState('');
+    const navigate = useNavigate();
+
     const title = "Вход в систему";
 
     return (
         <div>
-            <form className="height-full">
-            <h2>{ title }</h2>
+            <form className="height-full" onSubmit={async e => {
+                e.preventDefault();
+                await store.login(email, password);
+                navigate("../"); 
+            }}>
+                <h2>{ title }</h2>
                 <Input
                     handleChange={ e => setEmail(e.target.value) }
                     value={ email }
@@ -33,11 +40,11 @@ const LoginForm = props => {
                     required={ true }
                 />
                 <div className="bottom row justify-content-sm-center m-4">
-                    <AuthenticationButton 
-                        authenticationFunc={() => store.login(email, password)}
+                    <button
+                        className={"btn btn-outline-primary"}
                     >
-                            Войти
-                    </AuthenticationButton >
+                        Войти
+                    </button>
                 </div>
             </form>
         </div>

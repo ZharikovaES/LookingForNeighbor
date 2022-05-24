@@ -87,7 +87,6 @@ export default class UserService{
 
     static async getSimplifiedUsersByCityIdByUserIdByLimit(cityId, userId, typeContent, typeOfSimilarity, matchByParameters, relevanceRange, typeOfRating, scoreRange, limit){
         let result = null;
-        console.log(scoreRange);
         if (typeOfSimilarity === 0) {
             if (matchByParameters === 0) {
                 if (typeContent === 0){

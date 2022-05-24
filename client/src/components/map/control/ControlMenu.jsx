@@ -7,11 +7,11 @@ import classes from "./ControlMenu.module.css";
 import RangeTwoValues from "../../UI/range/RangeTwoValues";
 import { labelsRatingUser } from "../../../assets/labels"
 import CustomScrollbars from "../../UI/scrollbar/CustomScrollbars";
-//typeOfSimilarity
+
 const ControlMenu = props => {
     const { store } = useContext(Context);
     return (
-        <div className={[props.classPosition, classes.controlMenu, "bg-light text-dark border border-2"].join(' ')}>
+        <div className={[props.classPosition, classes.controlMenu, props.className, "bg-light text-dark border border-2"].join(' ')}>
             <HeaderMenuLogo/>
             <aside className={[classes.controlMenuAside, "lh-sm"].join(' ')}>
                 <CustomScrollbars autoHide autoHideTimeout={500} autoHideDuration={200}>

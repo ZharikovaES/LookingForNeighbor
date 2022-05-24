@@ -338,7 +338,6 @@ export default class UserController {
         try{
             const query = req.query;
             let users = [];
-            console.log(query.typeOfRating);
             if (query) 
                 if (query.userId) users = await UserService.getSimplifiedUsersByCityIdByUserIdByLimit(query.cityId, query.userId, parseInt(query.typeContent ?? 0), parseInt(query.typeOfSimilarity ?? 0), parseInt(query.matchByParameters ?? 0), query.relevanceRange.map(el => parseFloat(el)), parseInt(query.typeOfRating ?? 0), query.scoreRange ?? [1.0, 5.0], query.limit);
                 else users = await UserService.getSimplifiedUsersByCityIdByLimit(query.cityId, parseInt(query.typeContent ?? 0), query.limit);
@@ -355,7 +354,6 @@ export default class UserController {
             let result = {};
             if (cityId && userId && currentUserId) result = await UserService.getUserByCityIdByUserId(cityId, userId, currentUserId);
             else result = {};
-            console.log(result);
             res.json(result);    
         } catch (error){
             next(error);

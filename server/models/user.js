@@ -94,6 +94,8 @@ const deleteRefreshTokenByCityIdById = async (idCity, idUser) => {
 }
 
 const pushNewRatingByCityIdByUserId = async (idCity, idUser, idRatedUser, newRating, typeOfRating) => {
+  console.log("typeOfRating");
+  console.log(typeOfRating);
   const session = driver.session({ database });
   const result = await session.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user1:User {_id : $idUser}) WITH user1 AS userFrom
                                     MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user2:User {_id : $idRatedUser}) WITH userFrom, user2 AS userTo
@@ -109,6 +111,8 @@ const pushNewRatingByCityIdByUserId = async (idCity, idUser, idRatedUser, newRat
 }
 
 const findUsersAndRatingByCityIdByUserId = async (idCity, idUser, typeOfRating) => {
+  console.log("typeOfRating");
+  console.log(typeOfRating);
   const session = driver.session({ database });
   const result = await session.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user1:User)-[r:RATING]->(user2: User) WHERE r.realScore IS NOT NULL AND r.realScore[toInteger($typeOfRating)] <> 0
                                     RETURN  user1._id AS user1Id, r.realScore AS realScore, user2._id AS user2Id`,

@@ -21,9 +21,7 @@ const Home = () => {
                                             });
     useEffect(async () => {
         if (store.isAuth){
-            // console.log(store);
             const simplifiedUsers = await UserService.getSimplifiedUsers({cityId: store.location.city.idKladr, userId: store.user.id, ...filter});
-            // console.log(simplifiedUsers);
             setSimplifiedUsers(simplifiedUsers.map(el => { return { ...el, coordinatesPlaces: el.coordinatesPlaces}}));
         } else {
             const simplifiedUsers = await UserService.getSimplifiedUsers({cityId: store.location.city.idKladr, ...filter});
@@ -35,6 +33,7 @@ const Home = () => {
         <div className={classes.containerMain}>
             <ControlMenu 
                 classPosition={classes.menuLeft}
+                className={store.isAuth ? classes.auth : ''}
                 filter={filter}
                 changeFilter={value => setFilter({ ...filter, ...value }) }
             />
