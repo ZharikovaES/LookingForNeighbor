@@ -16,6 +16,15 @@ export default class AuthService {
            { headers: { "Content-Type": "multipart/form-data" }},
         );
     }
+    
+    static async authenticationByGoogle(credential) {
+        const { data } = await $api.post('/authentication/google', { credential });
+        return data;
+    }
+    static async authenticationByVK(properties) {
+        const { data } = await $api.post('/authentication/vk', properties);
+        return data;
+    }
     static async logout(data) {
         return $api.post('/logout', data);
     }

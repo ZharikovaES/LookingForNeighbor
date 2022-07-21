@@ -2,16 +2,16 @@ import React from 'react';
 import AboutUser from './AboutUser';
 import AuthorizationInfoUser from './AuthorizationInfoUser';
 
-
 const InfoUser = props => {
     return (
         <div>
             <AuthorizationInfoUser
-                handleChange={props.handleChange}
+                handleChange={props.handleUserChange}
                 newUser={ props.newUser } 
             />
             <AboutUser
-                handleChange={props.handleChange}
+                handleLocationChange={props.handleLocationChange}
+                handleUserChange={props.handleUserChange}
                 newUser={ props.newUser } 
                 location={props.location}
                 characteristics={props.characteristics}

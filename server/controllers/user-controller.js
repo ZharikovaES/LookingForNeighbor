@@ -1,7 +1,8 @@
 import { validationResult } from "express-validator";
 import ApiError from "../exceptions/ApiError.js";
-import FileService from "../service/file-service.js";
-import UserService from "../service/user-service.js";
+import FileService from "../services/file-service.js";
+import UserService from "../services/user-service.js";
+import passport from "passport";
 import Joi from 'joi'
 
 export default class UserController {
@@ -30,6 +31,11 @@ export default class UserController {
         },
         user:{
             id: Joi.any(),
+            typeAuth: Joi.number()
+                            .integer()
+                            .min(0)
+                            .max(2)
+                            .required(),
             username: Joi.string()
                             .pattern(/^[А-Яа-яA-Za-z]+$/, { name: 'letters' })
                             .min(3)
@@ -49,8 +55,7 @@ export default class UserController {
             password: Joi.string()
                             .pattern(/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])/, { name: 'letters and numbers' })
                             .min(5)
-                            .max(15)
-                            .required(),
+                            .max(15),
             image: {
                 file: Joi.object().required(),
                 imagePreviewUrl: Joi.string().min(0).required()
@@ -257,15 +262,34 @@ export default class UserController {
                             .required()
         },
     });
-    static async postNewRating(req, res, next){
+    static async authenticationGoogle(req, res, next) {
         try {
-            const data = req.body;
-            await UserService.pushNewRatingToUser(data);
-            res.status(200);
+            const { credential } = req.body;
+            const checkUser = await UserService.checkUserByAuthenticationGoogle(credential);
+            if (checkUser?.isAuth) {
+                res.cookie('refreshToken', checkUser.refreshToken, { maxAge: 30 * 24* 3600, httpOnly: true });
+                delete checkUser.refreshToken;
+            }
+            res.status(200).json(checkUser);    
         } catch (error) {
             next(error);
         }
     }
+    
+    static async authenticationVK(req, res, next) {
+        try {
+            const data = req.body;
+            const checkUser = await UserService.checkUserByAuthenticationVK(data);
+            if (checkUser?.isAuth) {
+                res.cookie('refreshToken', checkUser.refreshToken, { maxAge: 30 * 24* 3600, httpOnly: true });
+                delete checkUser.refreshToken;
+            }
+            res.status(200).json(checkUser);    
+        } catch (error) {
+            next(error);
+        }
+    }
+
     static async registration(req, res, next) {
         try {
             const formData = req.files;
@@ -356,6 +380,15 @@ export default class UserController {
             else result = {};
             res.json(result);    
         } catch (error){
+            next(error);
+        }
+    }
+    static async postNewRating(req, res, next){
+        try {
+            const data = req.body;
+            await UserService.pushNewRatingToUser(data);
+            res.status(200);
+        } catch (error) {
             next(error);
         }
     }

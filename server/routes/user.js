@@ -1,19 +1,25 @@
 import { Router } from "express";
-import userController from "../controllers/user-controller.js";
 import userModel from "../models/user.js";
+
+import UserController from "../controllers/user-controller.js";
+
 
 const user = Router();
 
-user.get('/users/simplified', userController.getSimplifiedInformationUsers);
-user.get('/users/:cityId/:userId/:currentUserId', userController.getUserById);
+user.get('/users/simplified', UserController.getSimplifiedInformationUsers);
+user.get('/users/:cityId/:userId/:currentUserId', UserController.getUserById);
+///authentication/google
+user.post('/user/rating', UserController.postNewRating );
 
-user.post('/user/rating', userController.postNewRating );
-user.post('/login', userController.login);
-user.post('/registration', userController.registration);
-user.post('/logout', userController.logout);
+user.post('/authentication/google', UserController.authenticationGoogle);
+user.post('/authentication/vk', UserController.authenticationVK);
 
-user.get('/activate/:city/:link', userController.activate);
-user.get('/refresh', userController.refresh);
+user.post('/login', UserController.login);
+user.post('/registration', UserController.registration);
+user.post('/logout', UserController.logout);
+
+user.get('/activate/:city/:link', UserController.activate);
+user.get('/refresh', UserController.refresh);
 
 user.put('/users', async (req, res) => {
     try{

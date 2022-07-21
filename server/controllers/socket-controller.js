@@ -1,4 +1,4 @@
-import ChatService from "../service/chat-service.js";
+import ChatService from "../services/chat-service.js";
 
 export const connection = socket => {        
     socket.on("create new chanel and get channels", data => {

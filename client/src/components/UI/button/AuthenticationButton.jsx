@@ -9,7 +9,7 @@ const AuthenticationButton = ({className, authenticationFunc, url = "/", childre
         className={["btn btn-outline-primary", className].join(' ')}
         onClick={async() => {
           await authenticationFunc();
-          navigate(".." + url); 
+          // navigate(".." + url); 
         }}
       >
         { children }

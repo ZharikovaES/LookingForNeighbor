@@ -43,7 +43,7 @@ export default class UtilService {
         let result = [];
         const DADATA_AUTHORIZATION_TOKEN = process.env.DADATA_AUTHORIZATION_TOKEN;
         const DADATA_SECRET_KEY = process.env.DADATA_SECRET_KEY;
-        const DADATA_API = process.env.DADATA_SUGGESTIONS_API;
+        const DADATA_API = process.env.DADATA_SUGGESTIONS_ADDRESS_API;
         const response = await axios.post(DADATA_API, 
                                                 { 
                                                     query: query,

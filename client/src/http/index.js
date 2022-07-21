@@ -1,6 +1,12 @@
 import axios from 'axios';
+
+const VK_APP_ID = 8183753;
+const VK_APP_AUTH_REDIRECT_URI = "http://localhost/authvk";
+
+export const URL_CLIENT = 'http://localhost:80/';
 export const URL = 'http://localhost:5000/';
 export const API_URL = `${URL}api/`;
+export const URL_VK_AUTH = 'https://oauth.vk.com/authorize?client_id='+VK_APP_ID+'&display=popup&redirect_uri='+VK_APP_AUTH_REDIRECT_URI+'&response_type=token&scope=email';
 
 const $api = axios.create({
     withCredentials: true,

@@ -34,10 +34,10 @@ const AboutUser = props => {
             }
     ];
     const handleChangeLocation = newProperty => {
-        props.handleChange({ location: { ...props.location, ...newProperty} });
+        props.handleLocationChange(newProperty);
     };
     const handleChangeUser = newProperty => {
-        props.handleChange({ user: { ...props.newUser, ...newProperty} });
+        props.handleUserChange(newProperty);
     };
     return (
         <div>

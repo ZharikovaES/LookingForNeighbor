@@ -1,3 +1,5 @@
+import React from "react";
+
 import About from "../pages/About";
 import Chat from "../pages/chat/Chat";
 import Error from "../pages/Error";

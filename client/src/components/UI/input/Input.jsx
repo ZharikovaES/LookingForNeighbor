@@ -1,13 +1,15 @@
 import React from "react";
 
 const Input = props =>  {
+    console.log(props.value);
     return (
-        <div>
+        <div className="form-group">
             { props.label && (<label htmlFor={props.id}>{props.label}</label>) }
             <input 
                 onChange={ props.handleChange }
                 value={ props.value }
                 type={props.type}
+                name={props.name}
                 placeholder={props.placeholder}
                 id={props.id}
                 required={ props.required }

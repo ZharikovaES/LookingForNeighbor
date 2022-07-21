@@ -29,6 +29,15 @@ export default class TokenService{
         }
     }
 
+    static decodeToken(token) {
+        try{
+            const data = jwt.decode(token);
+            return data;
+        } catch (error) {
+            return null;
+        }
+    }
+
     static async saveToken(location, userId, refreshToken){
         const records = await userModel.findByCityIdByUserId(location.city.idKladr, userId);
         // if (user.refreshToken) {

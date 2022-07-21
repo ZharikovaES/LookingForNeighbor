@@ -31,6 +31,7 @@ const InputPassword = props => {
     return (
         <div>   
             <Input
+                name={props.name}
                 handleChange={ handleChange }
                 value={ noConfirmPassword }
                 label="Введите пароль"

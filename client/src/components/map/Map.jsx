@@ -7,6 +7,7 @@ import { URL } from "../../http";
 import BalloonContentBody from "./balloons/BalloonContentBody";
 
 const Map = props => {
+    console.log(props);
     const navigate = useNavigate();
     const { store } = useContext(Context);
     const items = useMemo(() => {
@@ -20,6 +21,7 @@ const Map = props => {
             }}));
             return acc
         }, []);
+        console.log(result);
         return [...result];
     }, [props.groupItems]);
     const [ymaps, setYMaps] = useState(null);
@@ -53,7 +55,7 @@ const Map = props => {
                                 key={el.key} 
                                 geometry={el.coordinates} 
                                 properties={{
-                                    clusterCaption: el.item.username + (el.item.estimatedScore ? ` ${el.item.estimatedScore}` : ''),
+                                    clusterCaption: el.item.username + (el.item.estimatedScore ? ` ${el.item.estimatedScore[0].toFixed(3)}` : ''),
                                     balloonContentBody: renderToString(<BalloonContentBody
                                                                             userId={el.item.id}
                                                                             username={el.item.username}

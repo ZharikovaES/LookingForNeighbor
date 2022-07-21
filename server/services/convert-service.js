@@ -19,6 +19,7 @@ export default class ConvertService {
                 username: user.username,
                 dateOfBirth: user.birthdate,
                 gender: user.gender,
+                smoking: user.smoking,
                 estimatedScore: estimatedScore * 100 / 5.0,
                 image: {
                     file: '',
@@ -47,6 +48,7 @@ export default class ConvertService {
                 username: user.username,
                 dateOfBirth: user.birthdate,
                 gender: user.gender,
+                smoking: user.smoking,
                 estimatedScore: estimatedScore,
                 image: {
                     file: '',
@@ -91,6 +93,7 @@ export default class ConvertService {
                 },
                 email: user.email,
                 password: user.password,
+                typeAuth: user.typeAuth,
                 smoking: user.smoking,
                 attitudeAlcohol: user.attitudeAlcohol,
                 job: {
@@ -147,7 +150,6 @@ export default class ConvertService {
     static getScoreByUserId(records, user1Id, user2Id, indexType){
         for (const record of records){
             if (record.get('user1Id') === user1Id && record.get('user2Id') === user2Id) {
-                console.log(record.get('realScore'));
                 return record.get('realScore')[indexType];
             }
         }

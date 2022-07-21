@@ -6,13 +6,11 @@ import classes from "./NavBar.module.css";
 const NavBar = () => {
     const { store } = useContext(Context);
     const location = useLocation();
-    const navigate = useNavigate();
     const publicLinksNavBar = [{path: "/", title: "Главная"}, {path: "/login", title: "Войти"}, {path: "/registration", title: "Регистрация"}];
     const privateLinksNavBar = [{path: "/", title: "Главная"}, {path: `/chat/${store.location.city.idKladr}`, title: "Чат"}, {path: "/", title: "Выйти"}];
 
     const logout = async () => {
         await store.logout();
-        navigate('/');
     }
     return (
         <nav>

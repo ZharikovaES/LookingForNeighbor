@@ -7,11 +7,37 @@ const RangeTwoValues = ({style, hasMarks, label, step, min, max, values, handleC
   const [maxValueNumInput, setMaxValueNumInput] = useState(parseFloat(values[1]));
 
   useEffect(() => {
-    setMaxValueNumInput(parseFloat(values[1]));
-  }, [ values[1] ])
+    setCurrentValues(values);
+  }, [ values ]);
+  useEffect(() => {
+    setMaxValueNumInput(parseFloat(max));
+  }, [ max ]);
+
+  const styleInput = {
+    display: "block",
+    textAlign: "center",
+    flex: "0 1 auto",
+    padding: "0.375rem 0.75rem",
+    fontSize: "1rem",
+    fontWeight: "400",
+    lineHeight: "1.5",
+    color: "#212529",
+    backgroundColor: "#fff",
+    backgroundClip: "padding-box",
+    border: "1px solid #ced4da",
+    appearance: "none",
+    borderRadius: "0.25rem",
+    transition: "border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out",
+    outline: "none"
+};
 
   return (
-    <div className={className}>
+    <div 
+        className={className}
+        style={{
+            marginBottom: "15px"
+        }}
+    >
       { label && (<label>{label}</label>) }
       <div style={{margin: "40px"}}>
         <Range
@@ -107,9 +133,15 @@ const RangeTwoValues = ({style, hasMarks, label, step, min, max, values, handleC
             )}
         />
         </div>
-        <div>
+        <div 
+           style={{
+            display: "flex",
+            justifyContent: "center"
+           }} 
+        >
             <input 
                 type="number" 
+                style={styleInput}
                 min={min} 
                 max={currentValues[1]} 
                 value={minValueNumInput}
@@ -131,6 +163,10 @@ const RangeTwoValues = ({style, hasMarks, label, step, min, max, values, handleC
             />
             <input 
                 type="number" 
+                style={{ 
+                    ...styleInput,
+                    marginLeft: "1vw"
+                }}
                 min={currentValues[0]} 
                 max={max} 
                 value={maxValueNumInput}

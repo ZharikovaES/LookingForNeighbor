@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import { observer } from "mobx-react-lite";
+import React, { useContext, useState } from "react";
+import { Context } from "../..";
 import UtilService from "../../API/UtilService";
 import Checkbox from "../UI/input/Checkbox";
 import GroupInputsRadio from "../UI/input/GroupInputsRadio";
@@ -11,6 +13,8 @@ import MultiSelectSearch from "../UI/select/MultiSelectSearch";
 
 
 const DesiredApartment = props => {
+    const { store } = useContext(Context);
+
     const rooms = [
         {
             label: "Студия",
@@ -178,11 +182,11 @@ const DesiredApartment = props => {
     return (
         <div>
             <GroupSelectLocation
-                items={ props.location.places }
+                items={ props.location.places && store.isRegistrationProcess ? props.location.places : []}
                 cityId={ props.location.city.idKladr }
                 placeholder="Не важно"
                 getData={ UtilService.getAddresses }
-                handleChange={ items => props.handleChange({ location: {...props.location, places: items } }) }
+                handleChange={ items => props.handleLocationChange({ places: items }) }
             />
             <RangeValue
                 label="Сколько вы готовы тратить ежемесячно на аренду жилья?"
@@ -190,16 +194,16 @@ const DesiredApartment = props => {
                 min={budget.min}
                 max={budget.max}
                 value={props.apartment.budget}
-                handleChange={ value => props.handleChange({ apartment: {...props.apartment, budget: value } }) }
+                handleChange={ value => props.handleApartmentChange({ budget: value }) }
             />
             <MultiSelectSearch
                 label="Количество комнат"
                 placeholder="Не важно"
                 options={ rooms }
                 values={ props.apartment.rooms.map(el => { return { label: rooms[+el - 1].label, value: +el }}) }
-                handleChange={ values => props.handleChange({ apartment: {...props.apartment, 
+                handleChange={ values => props.handleApartmentChange({ 
                                         rooms: [...values.map(el => +el.value)]
-                                }}) }
+                                }) }
             />
             <GroupRangeTwoValues
                 label="Площадь"
@@ -211,7 +215,7 @@ const DesiredApartment = props => {
                     props.apartment.kitchenArea
                 ]}
                 handleChange = {(values, limits) => {
-                    props.handleChange({ apartment: {...props.apartment, fullArea: values[0], kitchenArea: values[1] } });
+                    props.handleApartmentChange({ fullArea: values[0], kitchenArea: values[1] });
                     setLimitsOfArea(limits);
                 }}
             />
@@ -226,7 +230,7 @@ const DesiredApartment = props => {
                     width: '42px',                        
                 }}}
                 handleChange={ values => {
-                    props.handleChange({ apartment: {...props.apartment, ceilingHeight: values } });
+                    props.handleApartmentChange({ ceilingHeight: values });
                 }}
             />
             <GroupRangeTwoValues
@@ -239,7 +243,7 @@ const DesiredApartment = props => {
                     props.apartment.floor
                 ]}
                 handleChange = {(values, limits) => {
-                    props.handleChange({ apartment: {...props.apartment, floorCount: values[0], floor: values[1] }});
+                    props.handleApartmentChange({ floorCount: values[0], floor: values[1] });
                     setLimitsOfFloorCount(limits);
                 }}
             />
@@ -251,7 +255,7 @@ const DesiredApartment = props => {
                     {value: 2, name: "Раздельный"}
                 ] }
                 value={ props.apartment.typeOfBathroom }
-                handleChange={ e => props.handleChange({ apartment: {...props.apartment, typeOfBathroom: +e.target.value }}) }
+                handleChange={ e => props.handleApartmentChange({ typeOfBathroom: +e.target.value}) }
                 name="bathroom"
             />
             <GroupInputsRadio
@@ -262,7 +266,7 @@ const DesiredApartment = props => {
                     {value: 2, name: "На улицу"}
                 ] }
                 value={ props.apartment.view }
-                handleChange={ e => props.handleChange({ apartment: {...props.apartment, view: +e.target.value }}) }
+                handleChange={ e => props.handleApartmentChange({ view: +e.target.value }) }
                 name="view"
             />
             <MultiSelectSearch
@@ -270,54 +274,54 @@ const DesiredApartment = props => {
                 placeholder="Не важно"
                 options={ repairs }
                 values={ props.apartment.repairs.map(el => { return { label: repairs[+el - 1].label, value: +el }}) }
-                handleChange={ values => props.handleChange({ apartment: {...props.apartment, 
+                handleChange={ values => props.handleApartmentChange({ 
                         repairs: [...values.map(el => el.value)]
-                                }}) }
+                                }) }
             />
             <MultiSelectSearch
                 label="Парковка"
                 placeholder="Не важно"
                 options={ parking }
                 values={ props.apartment.parking.map(el => { return { label: parking[+el - 1].label, value: +el }}) }
-                handleChange={ values => props.handleChange({ apartment: {...props.apartment, 
+                handleChange={ values => props.handleApartmentChange({ 
                         parking: [...values.map(el => el.value)]
-                                }}) }
+                                }) }
             />
             <MultiSelectSearch
                 label="Выберите удобства, которые обязательно должны присутствовать в жилье"
                 placeholder="Не важно"
                 options={ usability }
                 values={ props.apartment.usability.map(el => { return { label: usability[+el - 1].label, value: +el }}) }
-                handleChange={ values => props.handleChange({ apartment: {...props.apartment, 
+                handleChange={ values => props.handleApartmentChange({ 
                                     usability: [...values.map(el => el.value)]
-                                }}) }
+                                }) }
             />
             <MultiSelectSearch
                 label="Дети и животные"
                 placeholder="Не важно"
                 options={ permissions }
                 values={ props.apartment.permissions.map(el => { return { label: permissions[+el - 1].label, value: +el }}) }
-                handleChange={ values => props.handleChange({ apartment: {...props.apartment, 
+                handleChange={ values => props.handleApartmentChange({ 
                                     permissions: [...values.map(el => el.value)]
-                                }}) }
+                                }) }
             />
             <MultiSelectSearch
                 label="Класс жилья"
                 placeholder="Не важно"
                 options={ housingСlasses }
                 values={ props.apartment.housingСlass.map(el => { return { label: housingСlasses[+el - 1].label, value: +el }}) }
-                handleChange={ values => props.handleChange({ apartment: {...props.apartment, 
+                handleChange={ values => props.handleApartmentChange({ 
                                     housingСlass: [...values.map(el => el.value)]
-                                }}) }
+                                }) }
             />
             <MultiSelectSearch
                 label="Тип дома"
                 placeholder="Не важно"
                 options={ typesOfBuilding }
                 values={ props.apartment.typeOfBuilding.map(el => { return { label: typesOfBuilding[+el - 1].label, value: +el }}) }
-                handleChange={ values => props.handleChange({ apartment: {...props.apartment, 
+                handleChange={ values => props.handleApartmentChange({ 
                                     typeOfBuilding: [...values.map(el => el.value)]
-                                }}) }
+                                }) }
             />
             <RangeTwoValues
                 label="Год постройки дома"
@@ -330,7 +334,7 @@ const DesiredApartment = props => {
                     width: '42px',                        
                 }}}
                 handleChange={ values => {
-                    props.handleChange({ apartment: {...props.apartment, builtYear: values } });
+                    props.handleApartmentChange({ builtYear: values });
                 }}
             />
             <Checkbox
@@ -338,7 +342,7 @@ const DesiredApartment = props => {
                 checked={props.apartment.hasPhoto}
                 id="photo-exists"
                 handleChange={ value => {
-                    props.handleChange({ apartment: {...props.apartment, hasPhoto: value } });
+                    props.handleApartmentChange({ hasPhoto: value });
                 }}
             />
 
@@ -346,4 +350,4 @@ const DesiredApartment = props => {
     );
 }
 
-export default DesiredApartment;
+export default observer(DesiredApartment);

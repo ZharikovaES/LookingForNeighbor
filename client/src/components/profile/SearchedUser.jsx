@@ -17,7 +17,7 @@ const SearchedUser = props => {
                     {value: 2, name: "Учится"}
                 ] }
                 value={ props.searchedUser.isBusy }
-                handleChange={ e => props.handleChange({ searchedUser: {...props.searchedUser, isBusy: +e.target.value } }) }
+                handleChange={ e => props.handleChange({ isBusy: +e.target.value }) }
                 name="isBusy"
             />
             <GroupInputsRadio 
@@ -28,7 +28,7 @@ const SearchedUser = props => {
                     {value: 2, name: "Женский"}
                 ] }
                 value={ props.searchedUser.gender }
-                handleChange={ e => props.handleChange({ searchedUser: {...props.searchedUser, gender: +e.target.value } }) }
+                handleChange={ e => props.handleChange({ gender: +e.target.value }) }
                 name="gender"
             />
             <RangeTwoValues
@@ -41,7 +41,7 @@ const SearchedUser = props => {
                     height: '42px',
                     width: '42px',                        
                 }}}
-                handleChange={ values => props.handleChange({ searchedUser: {...props.searchedUser, age: values } }) }
+                handleChange={ values => props.handleChange({ age: values }) }
             />
             <MultiSelectSearch
                 label="Характеристики, которыми должен обладать искомый сосед"
@@ -49,9 +49,8 @@ const SearchedUser = props => {
                 options={ props.characteristics }
                 values={ props.searchedUser.characteristics.map(el => { return { label: props.characteristics[+el - 1].label, value: +el } }) }
                 handleChange={ values => {
-                    props.handleChange({ searchedUser: {...props.searchedUser, 
-                                                    characteristics: values.map(el => +el.value)
-                                                }}) }}
+                    props.handleChange({ characteristics: values.map(el => +el.value) }) 
+                }}
             />
             <GroupInputsRadio 
                 label="Религия"
@@ -60,15 +59,15 @@ const SearchedUser = props => {
                     {value: 1, name: "Схожа с религией, которую я исповедую (выбрал(-а) ранее)"},
                 ] }
                 value={ props.searchedUser.religion }
-                handleChange={ e => props.handleChange({ searchedUser: {...props.searchedUser, religion: +e.target.value} }) }
+                handleChange={ e => props.handleChange({ religion: +e.target.value}) }
                 name="attitude-religion"
             />
             <Checkbox
                 label="Подбирать пользователей только с фото"
-                checked={props.searchedUser.hasPhoto}
+                checked={ props.searchedUser.hasPhoto }
                 id="photo-exists"
                 handleChange={ value => {
-                    props.handleChange({ searchedUser: {...props.searchedUser, hasPhoto: value } });
+                    props.handleChange({ hasPhoto: value });
                 }}
             />
         </div>

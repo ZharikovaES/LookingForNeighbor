@@ -19,7 +19,6 @@ export default class RelevanceByRatingService{
                 userModel.pushEstimatedRecommendByCityIdByUserId(cityId, userId, vectorUser2[index], recommend[i][1], indexType);
             }
         }
-
     }
     static createRecommend(arr, userId, N=30) {
         let n = 0;
@@ -41,10 +40,15 @@ export default class RelevanceByRatingService{
 
     static svdEast(arr, userId, itemId, n, percentage = 0.9){
         let simTotal = 0.0, ratSimTotal = 0.0;
-        console.log(arr);
+        // console.log(arr);
         let { u, q: sigma } = SVD(arr);
         let k = this.sigmaPct(sigma, percentage);
         sigma = sigma.slice(0, k);
+        let index = sigma.findIndex(el => el === 0);
+        if (index !== -1) {
+            sigma = sigma.slice(0, index);
+            k = index;
+        }
         let sigmaK = [];
         for(let i = 0; i < k; i++) {
             sigmaK.push(new Array(k).fill(0));
@@ -319,12 +323,20 @@ export default class RelevanceByRatingService{
         //     [1 , 1 , 2 , 1 , 1 , 2 , 1 , 0 , 4 , 5 , 0, 1 , 1 , 2 , 1 , 1 , 2 , 1 , 0 , 4 , 5 , 0, 1 , 1 , 2 , 1 , 1 , 2 , 1 , 0 , 4 , 5 , 0, 1 , 1 , 2 , 1 , 1 , 2 , 1 , 0 , 4 , 5 , 0, 1 , 1 , 2 , 1 , 1 , 2 , 1 , 0 , 4 , 5 , 0, 1 , 1 , 2 , 1 , 1 , 2 , 1 , 0 , 4 , 5 , 0, 1 , 1 , 2 , 1 , 1 , 2 , 1 , 0 , 4 , 5 , 0, 1 , 1 , 2 , 1 , 1 , 2 , 1 , 0 , 4 , 5 , 0, 1 , 1 , 2 , 1 , 1 , 2 , 1 , 0 , 4 , 5 , 0, 1 , 1 , 2 , 1 , 1 , 2 , 1 , 0 , 4 , 5 , 0, 1 , 1 , 2 , 1 , 1 , 2 , 1 , 0 , 4 , 5 , 0, 1 , 1 , 2 , 1 , 1 , 2 , 1 , 0 , 4 , 5 , 0, 1 , 1 , 2 , 1 , 1 , 2 , 1 , 0 , 4 , 5 , 0, 1 , 1 , 2 , 1 , 1 , 2 , 1 , 0 , 4 , 5 , 0, 1 , 1 , 2 , 1 , 1 , 2 , 1 , 0 , 4 , 5 , 0, 1 , 1 , 2 , 1 , 1 , 2 , 1 , 0 , 4 , 5 , 0],
 
         // ];
+        // static exampleArray1 = [
+        //     [1, 2, 3, 1, 2, 3],
+        //     [3, 6, 9, 0, 0, 0],
+        //     [1, 2, 3, 1, 0, 3],
+        //     [1, 2, 3, 1, 2, 0],
+        //     [3, 6, 9, 3, 6, 9],
+        //     [1, 2, 3, 0, 2, 3],
+        // ]
 
-    // static exampleMatrix = new Matrix(this.exampleArray);
+    // static exampleMatrix = new Matrix(this.exampleArray1);
 // console.log(Matrix.eye(11, 11).mmul(Matrix.columnVector([2, 7.367e-2, 2, 2, 7.367e-2, 2, 2, 7.367e-2, 2, 2, 7.367e-2])));
 
 }
 // console.time('test of time')
-// console.log(RelevanceByRatingService.createRecommend(RelevanceByRatingService.exampleArray, 3));
+// console.log(RelevanceByRatingService.createRecommend(RelevanceByRatingService.exampleArray1, 1));
 // console.timeEnd('test of time')
 

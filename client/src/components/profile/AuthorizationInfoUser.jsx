@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 
 import Input from "../UI/input/Input";
 import CalendarDateOfBirth from "../UI/calendar/CalendarDateOfBirth";
@@ -6,11 +6,15 @@ import ImageUpload from "../UI/input/ImageUpload/ImageUpload";
 import InputPassword from "../UI/input/InputPassword";
 import GroupInputsRadio from '../UI/input/GroupInputsRadio';
 import TextArea from '../UI/input/TextArea';
+import { Context } from "../..";
 
 const AuthorizationInfoUser = props => {
+    const { store } = useContext(Context);
     const handleChange = newProperty => {
-        props.handleChange({ user: { ...props.newUser, ...newProperty }});
+        console.log(newProperty);
+        props.handleChange(newProperty);
     }
+    console.log(props.newUser);
     return (
         <div>
             <Input 
@@ -51,19 +55,22 @@ const AuthorizationInfoUser = props => {
                 value={ props.newUser.description }
                 handleChange={ e => handleChange({ description: e.target.value }) }
             />
-            <Input 
-                handleChange={ e => handleChange({ email: e.target.value }) }
-                value={ props.newUser.email }
-                label="Введите адрес электронной почты"
-                id="input-email"
-                type="text"
-                placeholder="Ваш email"
-                required={ true }
-            />
-            <InputPassword
-                value={ props.newUser.password }
-                onChange={ value => handleChange({ password: value }) }
-            />
+            { !store.isRegistrationProcess && (
+                <>
+                    <Input 
+                        handleChange={ e => handleChange({ email: e.target.value }) }
+                        value={ props.newUser.email }
+                        label="Введите адрес электронной почты"
+                        id="input-email"
+                        type="text"
+                        placeholder="Ваш email"
+                        required={ true }
+                    /> 
+                    <InputPassword
+                        value={ props.newUser.password }
+                        onChange={ value => handleChange({ password: value }) }
+                    />
+                </>) }
         </div>
     );
 }

@@ -1,9 +1,8 @@
 'use strict';
-import dotenv from 'dotenv';
+import 'dotenv/config';
 
 // const __dirname = path.resolve();
 // dotenv.config({ path: __dirname + '/.env', debug: true, override: true });
-dotenv.config();
 
 import express from 'express';
 import csv from 'csv-parser';
@@ -11,7 +10,10 @@ import fs from 'fs';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import fileUpload from 'express-fileupload';
+import session from 'express-session';
 import { Server } from 'socket.io';
+import passport from 'passport';
+
 import { connection } from './controllers/socket-controller.js';
 
 import errorMiddleware from './middlewares/error-middleware.js';
@@ -34,6 +36,22 @@ app.use(cors({
     origin: process.env.CLIENT_URL
 }));
 app.use(express.static('files'));
+
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    key: process.env.SESSION_KEY,
+    cookie: {
+      "path": "/",
+      "httpOnly": true,
+      "maxAge": null
+    },
+    // store: sessionStore,
+    resave: false,
+    saveUninitialized: true
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use('/', apartment);
 app.use('/api', user);
 app.use('/api', util);
@@ -51,10 +69,13 @@ app.use(errorMiddleware);
 const server = app.listen(process.env.PORT ?? 5000, () => {
     console.log('Server has been started...');
 })
-export const io = new Server(server, {
+const io = new Server(server, {
     cors: {
         credentials: true,
         origin: process.env.CLIENT_URL
     }
   });
 io.on('connection', connection);
+export  { 
+          io
+        }

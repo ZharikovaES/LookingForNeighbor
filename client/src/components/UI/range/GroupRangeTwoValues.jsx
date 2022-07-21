@@ -27,7 +27,7 @@ const GroupRangeTwoValues = props => {
                                 if (maxOfPreviousElement < element[1]) newArr[index][1] = maxOfPreviousElement;
                                 return [props.limits[index][0], maxOfPreviousElement];
                             });
-                            props.handleChange(newArr, newLimits);
+                            props.handleChange([...newArr], [...newLimits]);
                         } }
                     />    
                 ))

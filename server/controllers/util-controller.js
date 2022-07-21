@@ -1,12 +1,10 @@
-import UtilService from "../service/util-service.js";
+import UtilService from "../services/util-service.js";
 
 export default class UtilController{
     static async getCities(req, res, next){
         try{
-            console.log("START");
             const query = req.query;
             const cities = await UtilService.getCities(query.query);
-            console.log("FINISH", cities);
             res.json(cities);
         } catch (error) {
             console.log(error.response);
