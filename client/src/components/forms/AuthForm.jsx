@@ -1,19 +1,18 @@
 import { observer } from "mobx-react-lite";
 import React, { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Context } from "../..";
 import AuthSocial from "./AuthSocial/AuthSocial";
 
 const AuthForm = ({ title, children, onSubmit, handleUser }) => {
     const { store } = useContext(Context);
-    // const [ email, setEmail ] = useState('');
-    // const [ password, setPassword ] = useState('');
     const navigate = useNavigate();
+    const location = useLocation();
+    const fromPage = location.state?.from?.pathname || '/';
 
     useEffect(() => {
         if (store.isAuth) {
-            console.log(store.isAuth);
-            navigate("../");
+            navigate(fromPage);
         }
     }, [ store.isAuth ]);
 

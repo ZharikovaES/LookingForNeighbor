@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import React, { useContext, useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Context } from "..";
 import AuthForm from "../components/forms/AuthForm";
 import RegistrationForm from "../components/forms/RegistrationForm";
@@ -10,36 +10,17 @@ import SearchedUser from "../components/profile/SearchedUser";
 import AuthenticationButton from "../components/UI/button/AuthenticationButton";
 
 const Registration = () => {
-    const { store } = useContext(Context)
+    const { store } = useContext(Context);
     const navigate = useNavigate();
     const location = useLocation();
     const fromPage = location.state?.from?.pathname || '/';
-    // useEffect(() => {
-    //     if (store.isAuth)
-    //         navigate(fromPage);
-    // }, [store.isAuth]);
+    
+    useEffect(() => {
+        if (store.isAuth)
+            navigate(fromPage);
+    }, [store.isAuth]);
 
     const [ step, setStep ] = useState(0);
-    // const [ registrationData, setRegistrationData ] = useState({
-    //                                             location: {
-    //                                                 country: {
-    //                                                     id: 1
-    //                                                 },
-    //                                                 city: {
-    //                                                         idKladr: '0', 
-    //                                                         name: '',
-    //                                                         coordinates: []
-    //                                                     },
-    //                                                 places: [],
-    //                                                 coordinates: []   
-    //                                             },
-    //                                             user: {
-    //                                             },
-    //                                             searchedUser: {
-    //                                             },
-    //                                             apartment: {
-    //                                             }
-    //                                         });
     const characteristics = [
             {
                 label: "аккуратный",
@@ -73,12 +54,7 @@ const Registration = () => {
     const stageTitles = ["Заполните информацию о себе", 
                          "Заполните информацию об искомом пользователе",
                          "Заполните информацию об искомом жилье"];
-
-    // useEffect(() => {
-    //     if (store.isRegistrationProcess)
-    //         setStep(step + 1);
-    // }, [store.isRegistrationProcess]);
-                    
+                        
     const changeStep = step => {
         switch (step) {
             case 1:
@@ -159,7 +135,9 @@ const Registration = () => {
                         (
                             <AuthenticationButton 
                                 className="col-sm-4"
-                                authenticationFunc={() => store.registration()}
+                                authenticationFunc={() => {
+                                    store.registration();
+                                }}
                             >
                                     Зарегистрироваться
                             </AuthenticationButton>    

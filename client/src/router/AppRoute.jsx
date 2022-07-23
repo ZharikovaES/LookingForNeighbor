@@ -6,7 +6,6 @@ import { routes } from '.';
 import Header from '../components/header/Header';
 import Loader from '../pages/loader/Loader';
 import RequireAuth from '../hoc/RequireAuth';
-import { disableScroll, enableScroll } from '../utils/disable-scroll';
 
 function AppRoute() {
   const { store } = useContext(Context);
@@ -24,10 +23,11 @@ function AppRoute() {
 
   const showLoader = () => {
     if (store.isLoading) {
-      disableScroll();
+      document.body.style.overflow = "hidden";
       return (<Loader/>); 
     }
-    else enableScroll();
+    else document.body.style.overflow = "auto";
+
   };
 
   useEffect(() => {

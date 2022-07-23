@@ -131,8 +131,9 @@ export default class LocationServices{
     }
     static async getCoordinatesByCityName(fullName) {
         const data = await this.getCleanAddresses([fullName]);
-        const cities = data.filter(el => el.region_type === 'г');
-        if (cities[0].qc_geo)
+        const cities = data.filter(el => el.region_type === 'обл' || el.region_type === 'г' || el.city_type === 'г');
+        console.log(data);
+        if (cities[0]?.qc_geo)
             if (cities[0].qc_geo !== 5) 
                 return [cities[0].geo_lat, cities[0].geo_lon];
         return null;

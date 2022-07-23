@@ -158,7 +158,8 @@ export default class Store{
             this.user = response.data.user;
             this.searchedUser = response.data.searchedUser;
             this.apartment = response.data.apartment;
-            this.setRegistrationProcess(false);
+            // this.setRegistrationProcess(false);
+            console.log("finish");
             this.setAuth(true);
         } catch (error) {
             if (error.response)

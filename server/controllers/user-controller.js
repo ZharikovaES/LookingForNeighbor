@@ -22,6 +22,7 @@ export default class UserController {
                             .pattern(/^[А-Яа-яA-Za-z\s-]+$/, { name: 'not numbers' })
                             .min(2)
                             .required(),
+                coordinates: Joi.array().min(0).max(2).items(Joi.number())
             },
             places: Joi.array().min(0).items({
                                                 label: Joi.string(),
@@ -169,10 +170,9 @@ export default class UserController {
                             .required()
         },
         apartment: {
-            budget: Joi.number()
-                        .integer()
-                        .min(5000)
-                        .max(300000)
+            budget: Joi
+                        .array()
+                        .items(Joi.number().integer().min(5000).max(300000))
                         .required(),
             rooms: Joi.array()
                         .min(0)
@@ -294,18 +294,16 @@ export default class UserController {
         try {
             const formData = req.files;
             const data = JSON.parse(formData.newUser.data.toString());
-            UserController.schemaRegistration.validate(data);
+            const validateData = UserController.schemaRegistration.validate(data);
+            if (validateData.hasOwnProperty("error")) throw ApiError.BadRequest('Ошибка при валидации', validateData.error);
+
             if (formData.imageUser)
                 formData.imageUser.name = data.user.image.imagePreviewUrl = Date.now() + "-" + formData.imageUser.name.replace(/\s+/gi, "-");
-            // if (!errors.isEmpty()) throw ApiError.BadRequest('Ошибка при валидации', errors.array());
             const result = await UserService.registration(data);
 
-            console.log(result);
-            // console.log(result.user.id, formData.imageUser);
             if (result.user.id && formData.imageUser) await FileService.uploadFile(result.user.id, formData.imageUser);
 
             res.cookie('refreshToken', result.refreshToken, { maxAge: 30 * 24* 3600, httpOnly: true });
-            // delete result.refreshToken;
             res.status(201).json(result);
         } catch (error) {
             next(error);
