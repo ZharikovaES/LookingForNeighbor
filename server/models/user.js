@@ -31,17 +31,14 @@ const findByCityIdByUserId = async (idCity, idUser) => {
   return result.records;
 }
 const findByCityIdByUserIdRating = async (idCity, idUser, idCurrentUser) => {
-  // console.log(idCity, idUser, idCurrentUser);
   const session = driver.session({ database });
-  const result = await session.run(`MATCH (country:Country {code: "RUS"})-[r:INCLUDES]->(city:City {idKladr: "${idCity}"})-[s:INCLUDES]->(user:User {_id : "${idUser}"})-[s1:INCLUDES]->(searchInfo: SearchInfo) WITH city, user, searchInfo
+  const result = await session.run(`MATCH (country:Country {code: "RUS"})-[r:INCLUDES]->(region:Region)-[:INCLUDES]->(city:City {idKladr: "${idCity}"})-[s:INCLUDES]->(user:User {_id : "${idUser}"})-[s1:INCLUDES]->(searchInfo: SearchInfo) WITH city, user, searchInfo
                                     MATCH (user)-[s2:INCLUDES]->(desiredApartment: DesiredApartment) WITH city, user, searchInfo, desiredApartment
                                     OPTIONAL MATCH (userFrom:User{_id: $idCurrentUser})-[r:RATING]->(user) 
                                     RETURN city, user, searchInfo, desiredApartment, r.realScore AS realScore`, {
                                       idCurrentUser
                                     });
   await session.close();
-  // console.log("result.records");
-  // console.log(result.records);
   return result.records;
 }
 const findByCityIdByEmail = async (idCity, email) => {
@@ -52,15 +49,12 @@ const findByCityIdByEmail = async (idCity, email) => {
   return result.records.map(i => i.get('u').properties)[0];
 }
 const findByEmail = async email => {
-  console.log(54);
-  console.log(email);
   const session = driver.session({ database });
   const result = await session.run(`MATCH (country:Country {code: "RUS"})-[r:INCLUDES]->(:Region)-[r1:INCLUDES]->(city:City)-[s:INCLUDES]->(user:User {email: $email})-[s1:INCLUDES]->(searchInfo: SearchInfo) WITH city, user, searchInfo
                                     MATCH (user)-[s2:INCLUDES]->(desiredApartment: DesiredApartment)
                                     RETURN city, user, searchInfo, desiredApartment`,
                                     { email });
   const records = result.records;
-  // console.log(records);
   await session.close();
   return records;
 }
@@ -72,15 +66,12 @@ const findByCityIdByActivationLink = async (idCity, activationLink) => {
   return result.records.map(i => i.get('u').properties)[0];
 }
 const findTokenByCityIdByUserId = async (idCity, idUser) => {
-  // console.log("idCity, idUser");
-  // console.log(idCity, idUser);
   const session = driver.session({ database });
   const result = await session.run(`match (country:Country {code: "RUS"})-[r:INCLUDES]->(:Region)-[r1:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(u:User {_id : $idUser}) return u limit 1`,
                                     {
                                       idCity, idUser
                                     });
   await session.close();
-  // console.log(result.records.map(i => i.get('u').properties));
   const user = result.records.map(i => i.get('u').properties)[0];
   
   return user ? user.refreshToken : null;
@@ -97,11 +88,9 @@ const deleteRefreshTokenByCityIdById = async (idCity, idUser) => {
 }
 
 const pushNewRatingByCityIdByUserId = async (idCity, idUser, idRatedUser, newRating, typeOfRating) => {
-  console.log("typeOfRating");
-  console.log(typeOfRating);
   const session = driver.session({ database });
-  const result = await session.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user1:User {_id : $idUser}) WITH user1 AS userFrom
-                                    MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user2:User {_id : $idRatedUser}) WITH userFrom, user2 AS userTo
+  const result = await session.run(`MATCH (country:Country {code: "RUS"})-[:INCLUDES]->(region:Region)-[:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user1:User {_id : $idUser}) WITH user1 AS userFrom, country, region, city
+                                    MATCH (country)-[:INCLUDES]->(region)-[:INCLUDES]->(city)-[s:INCLUDES]->(user2:User {_id : $idRatedUser}) WITH userFrom, user2 AS userTo
                                     MERGE (userFrom)-[r:RATING]->(userTo)
                                        SET r.realScore = r.realScore[0..toInteger($typeOfRating)] + $newRating + r.realScore[toInteger($typeOfRating + 1)..8]
                                     RETURN r.realScore, userTo._id`,
@@ -114,61 +103,55 @@ const pushNewRatingByCityIdByUserId = async (idCity, idUser, idRatedUser, newRat
 }
 
 const findUsersAndRatingByCityIdByUserId = async (idCity, idUser, typeOfRating) => {
-  console.log("typeOfRating");
-  console.log(typeOfRating);
   const session = driver.session({ database });
-  const result = await session.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user1:User)-[r:RATING]->(user2: User) WHERE r.realScore IS NOT NULL AND r.realScore[toInteger($typeOfRating)] <> 0
+  const result = await session.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(region:Region)-[:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user1:User)-[r:RATING]->(user2: User) WHERE r.realScore IS NOT NULL AND r.realScore[toInteger($typeOfRating)] <> 0
                                     RETURN  user1._id AS user1Id, r.realScore AS realScore, user2._id AS user2Id`,
                                     {
                                       idCity, idUser, typeOfRating
                                     });
 
-  // console.log(result.records);
   await session.close();
   return result.records;
 }
 const findUsersByCityIdByUserIdByEstimatedScore = async (idCity, idUser, scoreRange) => {
   const session = driver.session({ database });
-  const result = await session.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user1:User{_id:$idUser})-[r:RATING]->(user2: User)-[:INCLUDES]->(d:DesiredApartment) WHERE r.estimatedScoreAll IS NOT NULL AND toFloat($scoreRange[0]) <= r.estimatedScoreAll AND toFloat($scoreRange[1]) >= r.estimatedScoreAll 
+  const result = await session.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(region:Region)-[:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user1:User{_id:$idUser})-[r:RATING]->(user2: User)-[:INCLUDES]->(d:DesiredApartment) WHERE r.estimatedScoreAll IS NOT NULL AND toFloat($scoreRange[0]) <= r.estimatedScoreAll AND toFloat($scoreRange[1]) >= r.estimatedScoreAll 
                                     RETURN  user1._id AS user1Id, r.estimatedScoreAll AS estimatedScore, user2._id AS user2Id, d, user2`,
                                     {
                                       idCity, idUser, scoreRange
                                     });
 
-  // console.log(result.records);
   await session.close();
   return result.records;
 }
 const findUsersByCityIdByUserIdByEstimatedScoreByTypeOfRating = async (idCity, idUser, scoreRange, typeOfRating) => {
   const session = driver.session({ database });
-  const result = await session.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user1:User{_id:$idUser})-[r:RATING]->(user2: User)-[:INCLUDES]->(d:DesiredApartment) WHERE r.estimatedScore IS NOT NULL AND toFloat($scoreRange[0]) <= r.estimatedScore[toInteger($typeOfRating)] AND toFloat($scoreRange[1]) >= r.estimatedScore[toInteger($typeOfRating)] 
+  const result = await session.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(region:Region)-[:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user1:User{_id:$idUser})-[r:RATING]->(user2: User)-[:INCLUDES]->(d:DesiredApartment) WHERE r.estimatedScore IS NOT NULL AND toFloat($scoreRange[0]) <= r.estimatedScore[toInteger($typeOfRating)] AND toFloat($scoreRange[1]) >= r.estimatedScore[toInteger($typeOfRating)] 
                                     RETURN  user1._id AS user1Id, r.estimatedScore AS estimatedScore, user2._id AS user2Id, d, user2`,
                                     {
                                       idCity, idUser, scoreRange, typeOfRating
                                     });
 
-  // console.log(result.records);
   await session.close();
   return result.records;
 }
 const pushEstimatedRecommendByCityIdByUserId = async (idCity, idUser, idRatedUser, recommend, typeOfRating) => {
   const session = driver.session({ database });
-  const result = await session.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user1:User {_id : $idUser}) WITH user1 AS userFrom
-                                    MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user2:User {_id : $idRatedUser}) WITH userFrom, user2 AS userTo
-                                    MERGE ((userFrom)-[r:RATING]->(userTo))
+  const result = await session.run(`MATCH (country:Country {code: "RUS"})-[:INCLUDES]->(region:Region)-[:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user1:User {_id : $idUser}) WITH user1 AS userFrom, country, region, city
+                                    MATCH (country)-[:INCLUDES]->(region)-[:INCLUDES]->(city)-[s:INCLUDES]->(user2:User {_id : $idRatedUser}) WITH userFrom, user2 AS userTo
+                                    MERGE (userFrom)-[r:RATING]->(userTo)
                                        SET r.estimatedScore = r.estimatedScore[0..toInteger($typeOfRating)] + $recommend + r.estimatedScore[toInteger($typeOfRating + 1)..8], r.estimatedScoreAll = reduce(totalScore = 0.0, value IN r.estimatedScore | totalScore + value) / 8
                                     RETURN r.estimatedScore, userTo._id`,
                                     {
                                       idCity, idUser, idRatedUser, recommend, typeOfRating
                                     });
 
-  // console.log(result.records);
   await session.close();
   return result.records;
 }
 const findUsersByCityIdByUserId = async (idCity, idUser, relevanceRange, limit) => {
   const session = driver.session({ database });
-  await session.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: $idCity})-[:INCLUDES]->(user:User {_id : $idUser})-[s1:INCLUDES]->(s:SearchInfo) WITH city, user, s, [10.0, 10.0] + 
+  await session.run(`MATCH (country:Country {code: "RUS"})-[:INCLUDES]->(region:Region)-[:INCLUDES]->(city:City {idKladr: $idCity})-[:INCLUDES]->(user:User {_id : $idUser})-[s1:INCLUDES]->(s:SearchInfo) WITH city, user, s, [10.0, 10.0] + 
                                   (CASE
                                     WHEN s.isBusy = 0 THEN [10.0, 10.0, 10.0, 10.0, 10.0]
                                     WHEN s.isBusy = 1 THEN [10.0, 10.0]
@@ -265,17 +248,17 @@ const findUsersByCityIdByUserId = async (idCity, idUser, relevanceRange, limit) 
                                       10.0 * (d1.builtYear[0] - 1700) / (date({timezone: 'Europe/Moscow'}).year - 1700), 10.0 * (d1.builtYear[1] - 1700) / (date({timezone: 'Europe/Moscow'}).year - 1700),
                                     10.0 * toInteger(d1.hasPhoto)] AS vector2
                                       FOREACH (_ IN CASE WHEN person IS NOT NULL THEN [1] END | MERGE (user)-[r:RELEVANCE]->(person) 
-                                        ON CREATE SET r.coefficient = gds.alpha.similarity.euclidean(vector1, vector2), r.coefficientUpdateDate = datetime({timezone: 'Europe/Moscow'}).epochMillis) WITH city, user
-                                        RETURN city, user`,
+                                        ON CREATE SET r.coefficient = gds.alpha.similarity.euclidean(vector1, vector2), r.coefficientUpdateDate = datetime({timezone: 'Europe/Moscow'}).epochMillis)
+                                        RETURN city, user, person
+                                      `,
                                       {
-                                      idCity, idUser,
-                                      relevanceRange
+                                      idCity, idUser
                                     });
 
   await session.close();
 
   const session1 = driver.session({ database });
-  const result = await session1.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user:User {_id : $idUser})-[r:RELEVANCE]->(u: User)-[s1:INCLUDES]->(d:DesiredApartment) WHERE r.coefficient >= toFloat($relevanceRange[0]) AND r.coefficient <= toFloat($relevanceRange[1]) 
+  const result = await session1.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(:Region)-[:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user:User {_id : $idUser})-[r:RELEVANCE]->(u: User)-[s1:INCLUDES]->(d:DesiredApartment) WHERE r.coefficient >= toFloat($relevanceRange[0]) AND r.coefficient <= toFloat($relevanceRange[1]) 
                                     RETURN u, d ORDER BY r.coefficient DESC` + (limit ? ` limit ${Math.abs(Math.trunc(+limit))}` : ''),
                                     {
                                       idCity, idUser,
@@ -286,26 +269,26 @@ const findUsersByCityIdByUserId = async (idCity, idUser, relevanceRange, limit) 
   return result.records;
 }
 const findUsersByCityIdByUserIdPartialMatch = async (idCity, idUser, relevanceRange, limit) => {
-  const session = driver.session({ database });
-  const result = await session.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user:User {_id : $idUser})-[r:RELEVANCE]->(u: User)-[s1:INCLUDES]->(d:DesiredApartment) WHERE r.coefficient >= $relevanceRange[0] AND r.coefficient <= $relevanceRange[1] 
+  const session1 = driver.session({ database });
+  const result = await session1.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(:Region)-[:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user:User {_id : $idUser})-[r:RELEVANCE]->(u: User)-[s1:INCLUDES]->(d:DesiredApartment) WHERE r.coefficient >= $relevanceRange[0] AND r.coefficient <= $relevanceRange[1] 
                                     RETURN u, d ORDER BY r.coefficient DESC` + (limit ? ` limit ${Math.abs(Math.trunc(+limit))}` : ''),
                                     {
                                       idCity, idUser,
                                       relevanceRange
                                     });
 
-  await session.close();
+  await session1.close();
   return result.records;
 }
 const findUsersByCityIdByUserIdFullMatch = async (idCity, idUser, limit) => {
-  const session = driver.session({ database });
-  const result = await session.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user:User {_id : $idUser})-[r:RELEVANCE]->(u: User)-[s1:INCLUDES]->(d:DesiredApartment) WHERE r.coefficient = 1 
+  const session1 = driver.session({ database });
+  const result = await session1.run(`MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(:Region)-[:INCLUDES]->(city:City {idKladr: $idCity})-[s:INCLUDES]->(user:User {_id : $idUser})-[r:RELEVANCE]->(u: User)-[s1:INCLUDES]->(d:DesiredApartment) WHERE r.coefficient = 1 
                                     RETURN u, d ORDER BY r.coefficient DESC` + (limit ? ` limit ${Math.abs(Math.trunc(+limit))}` : ''),
                                     {
                                       idCity, idUser
                                     });
 
-  await session.close();
+  await session1.close();
   return result.records;
 }
 const create = async (locationData, user, searchedUser, apartment) => {
@@ -318,7 +301,7 @@ const create = async (locationData, user, searchedUser, apartment) => {
     coordinates = location.coordinates;    
   }
   const session = driver.session({ database });
-  const result = await session.run(`CYPHER expressionEngine=interpreted MERGE (country: Country {code: "RUS"})-[:INCLUDES]->(region) WITH country, region
+  const result = await session.run(`CYPHER expressionEngine=interpreted MERGE (country: Country {code: "RUS"})-[:INCLUDES]->(region:Region) WITH country, region
                                    MERGE (region)-[i:INCLUDES]->(city: City {idKladr: $cityId}) 
                                      ON CREATE SET city.name = $cityName, city.coordinates = $cityCoordinates WITH country, city
                                      CREATE (city)-[s:INCLUDES]->(user: User {
@@ -580,7 +563,6 @@ const create = async (locationData, user, searchedUser, apartment) => {
             return i.get("regionId");
         return null;
       });
-      console.log(result1.records, regionArr);
       regionId = regionArr.filter(el => el)[0] ?? null;
       const cityArr = result1.records.map(i => { 
         if (i.has("cityId")) 
@@ -588,13 +570,9 @@ const create = async (locationData, user, searchedUser, apartment) => {
             return i.get("cityId");
         return null;
       });
-      console.log(cityArr, cityArr.filter(el => el));
       cityId = cityArr.filter(el => el)[0] ?? null;
-      console.log(regionArr, cityArr);
 
     }
-    console.log("regionId, cityId");
-    console.log(regionId, cityId);
     result1.records.forEach(i => { 
       for (const key of keys)
         if (i.has(key)) 
@@ -632,14 +610,6 @@ const create = async (locationData, user, searchedUser, apartment) => {
         apartmentId: records.map(i => i.get('desiredApartment').properties)[0]?._id, 
         regionId, cityId, ...locationId,
       });
-      console.log("finish");
-      console.log(records.map(i => i.get('desiredApartment').properties)[0]?._id);
-      console.log(r.records);
-      console.log(r.records.map(i => i.get('district')));
-      console.log(r.records.map(i => i.get('street')));
-      console.log(r.records.map(i => i.get('house')));
-      console.log(r.records.map(i => i.get('metro1')));
-      // console.log(r.records.map(i => i.get('i')));
     await newSession.close();
 
   }
@@ -648,7 +618,6 @@ const create = async (locationData, user, searchedUser, apartment) => {
     return records;
 }
 const updateUser = async (location, user) => {
-  // console.log("_id", location, user._id, user.refreshToken);
   const session = driver.session({ database });
   const result = await session.run(`MATCH (city:City{idKladr: $location.city.idKladr})-[s:INCLUDES]->(user: User { _id : $user._id })
                                       SET user += $user, user.accountModificationDate = datetime({timezone: 'Europe/Moscow'}).epochMillis
@@ -700,10 +669,9 @@ const updateUserAndСoefficient = async (location, user) => {
 
 const deleteById = async (cityId, userId) => {
   const result = await session.run(`
-                                    MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(city:City {idKladr: "${cityId}"})-[r:INCLUDES]->(user:User {_id: "${userId}"})-[s:INCLUDES]->(n)
+                                    MATCH (country:Country {code: "RUS"})-[i:INCLUDES]->(:Region)-[:INCLUDES]->(city:City {idKladr: "${cityId}"})-[r:INCLUDES]->(user:User {_id: "${userId}"})-[s:INCLUDES]->(n)
                                      DETACH DELETE user, n
                                     `);
-  // console.log(result);
   // return result.records.map(i => i.get('user').properties)[0];
 }
 

@@ -9,8 +9,6 @@ import RelevanceByRatingService from "./relevancy-by-ratings-service.js";
 
 export default class UserService{
     static async registration(data){
-        console.log("location:");
-        console.log(data);
         const candidate = await userModel.findByCityIdByEmail(data.location.city.idKladr, data.user.email);
         if (candidate) throw ApiError.BadRequest(`Пользователь с электронным адресом ${data.user.email} уже существует`);
         if (data.user?.typeAuth) {
@@ -23,8 +21,6 @@ export default class UserService{
         const { location, user, searchedUser, apartment } = ConvertService.convertDataDbObjToClientObj(records);
         delete user?.accessToken;
         delete user?.refreshToken;
-        // console.log(27);
-        // console.log(user);
         if (!data?.user?.typeAuth) {
             await MailService.sendActivationMail(user.email, process.env.API_URL + 'api/activate/' + data.location.city.idKladr + "/" + user.activationLink);
         }
@@ -41,8 +37,6 @@ export default class UserService{
     static async login(email, password){
         const records = await userModel.findByEmail(email);
         const { location, user, searchedUser, apartment } = ConvertService.convertDataDbObjToClientObj(records);
-        console.log(45);
-        console.log(location, user, searchedUser, apartment);
         if (!user) throw ApiError.BadRequest('Пользователь с таким email не найден');
         // if (user.typeAuth && email && password) throw ApiError.BadRequest(`Пользователь аутентифицировался через ${user.typeAuth === 1 ? 'Google-аккаунт' : 'аккаунт VK'}`);
         // if (user.typeAuth === 0) {
@@ -68,8 +62,6 @@ export default class UserService{
         const { email, given_name, email_verified } = TokenService.decodeToken(credential);
         const { location, user, searchedUser, apartment } = ConvertService.convertDataDbObjToClientObj(await userModel.findByEmail(email));
         if (location && user && searchedUser && apartment) {
-            // console.log(location && user && searchedUser && apartment);
-            // console.log(location, user, searchedUser, apartment);
             // if (!user?.typeAuth) throw ApiError.BadRequest(`Пользователь не аутентифицировался через сторонние сервисы`);
             // if (user?.typeAuth === 1) {
                 delete user.password; 
@@ -101,15 +93,10 @@ export default class UserService{
         return { isAuth: false, user: { email }};
     }
 
-
-
-
     static async refresh(refreshToken) {
         if (!refreshToken) throw ApiError.UnauthorizedError();
         const userData = TokenService.validateRefreshToken(refreshToken);
         const tokenFromDB = await TokenService.findToken(userData.city.idKladr, userData.id);
-        console.log("tokenFromDB:");
-        console.log(userData, tokenFromDB);
         if (!(userData && tokenFromDB)) throw ApiError.UnauthorizedError();
         const records = await userModel.findByCityIdByUserId(userData.city.idKladr, userData.id);
         const { location, user, searchedUser, apartment } = ConvertService.convertDataDbObjToClientObj(records);
@@ -127,7 +114,6 @@ export default class UserService{
         const result = ConvertService.convertDataDbObjToClientObj(records);
         return result;
     }
-
 
     static async getSimplifiedUsersByCityIdByLimit(cityId, typeContent, limit){
         let result = null;

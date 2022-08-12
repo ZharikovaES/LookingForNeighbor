@@ -344,10 +344,8 @@ export default class UserController {
     }
     static async refresh(req, res, next) {
         try {
-            console.log("refresh:");
             const { refreshToken } = req.cookies;
             const result = await UserService.refresh(refreshToken);
-            console.log(result);
             res.cookie('refreshToken', result.refreshToken, { maxAge: 30 * 24* 3600, httpOnly: true });
             delete result.refreshToken;
             res.status(201).json(result);

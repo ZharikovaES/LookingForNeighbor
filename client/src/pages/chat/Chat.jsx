@@ -30,7 +30,7 @@ const Chat = () => {
     const messageAndChannelListener = (messages, channelId) => {
         setCurrentChannelId(channelId);
         setCurrentMesssages([...messages]);
-                refMessagesList.current.scrollTop = refMessagesList.current.scrollHeight;
+        refMessagesList.current.scrollTop = refMessagesList.current.scrollHeight;
     }
     const messageListener = (messages, channelId) => {
         setCurrentMesssages([...messages]);
@@ -87,7 +87,7 @@ const Chat = () => {
     }
 
     return (
-        <div className={[classes.chat, "height-full"].join(' ')}>
+        <div className={[classes.Chat, "height-full"].join(' ')}>
             <ChannelList 
                 currentChannelId={currentChannelId} 
                 channels={channels} 

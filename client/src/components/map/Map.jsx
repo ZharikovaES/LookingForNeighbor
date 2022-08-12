@@ -7,21 +7,18 @@ import { URL } from "../../http";
 import BalloonContentBody from "./balloons/BalloonContentBody";
 
 const Map = props => {
-    console.log(props);
     const navigate = useNavigate();
     const { store } = useContext(Context);
     const items = useMemo(() => {
         const result = props.groupItems.reduce((acc, group) => {
-            acc.push(...group.coordinatesPlaces.map((coordinate, index) => { return {
+            acc.push(...group.coordinatesPlaces.map((coordinate, index) => ({
                 coordinates: coordinate.split(' '),
                 place: group.labelsPlaces[index],
                 item: group,
                 key: coordinate + group.id,
-                
-            }}));
+            })));
             return acc
         }, []);
-        console.log(result);
         return [...result];
     }, [props.groupItems]);
     const [ymaps, setYMaps] = useState(null);

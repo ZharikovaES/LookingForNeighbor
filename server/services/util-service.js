@@ -5,7 +5,6 @@ export default class UtilService {
         let result = [];
         const KLADR_TOKEN = process.env.KLADR_TOKEN;
         const KLADR_API = process.env.KLADR_API;
-        // console.log(query);
         // axios.interceptors.request.use((config) => {
         //     if (config.method !== 'get') {
         //       config.data = qs.stringify(config.data) // fix Rails i18n error
@@ -65,9 +64,7 @@ export default class UtilService {
                                             );
         if (response)
             if (response.data){
-                result = response.data.suggestions;
-                // console.log(result);
-                
+                result = response.data.suggestions;                
                 if (result) result = result.filter(el => +el.data.fias_level < 65 && el.data.settlement_type !== "д").map(el => { return { value: el.unrestricted_value, label: el.value }});
             }
         return result;
